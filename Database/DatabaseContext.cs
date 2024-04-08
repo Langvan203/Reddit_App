@@ -28,11 +28,11 @@ namespace Reddit_App.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if(!optionsBuilder.IsConfigured)
-            {
-                var sqlConnection = "Data Source=LANGVAN;Initial Catalog=Reddit_App;Integrated Security=True;Trust Server Certificate=True";
-                optionsBuilder.UseSqlServer(sqlConnection);
-            }    
+            //if(!optionsBuilder.IsConfigured)
+            //{
+            //    var sqlConnection = "Data Source=LANGVAN;Initial Catalog=Reddit_App;Integrated Security=True;Trust Server Certificate=True";
+            //    optionsBuilder.UseSqlServer(sqlConnection);
+            //}    
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
