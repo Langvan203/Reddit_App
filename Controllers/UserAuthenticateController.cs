@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Internal;
 using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
@@ -29,6 +30,23 @@ namespace Reddit_App.Controllers
             {
                 var res = _userAuthenticateService.UserLogin(request);
                 return new MessageData { Data = res, Des = "Login success" };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("UserRegister")]
+
+        public MessageData UserRegister(UserRegisterRequest request)
+        {
+            try
+            {
+                var res = _userAuthenticateService.UserRegister(request);
+                return new MessageData { Data = res, Des = "Register succesfully" };
             }
             catch(Exception ex)
             {

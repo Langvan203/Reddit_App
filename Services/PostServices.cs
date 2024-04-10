@@ -24,7 +24,7 @@ namespace Reddit_App.Services
             _webhost = webhost;
         }
 
-        public MessageData AddNewProduct(CreateNewPost request, int userID)
+        public MessageData AddNewPost(CreateNewPost request, int userID)
         {
             try
             {
@@ -60,6 +60,65 @@ namespace Reddit_App.Services
             catch
             {
                 return new MessageData { Data = null, Des = "get all post failed" };
+            }
+        }
+        
+        public MessageData GetPostByUser(int userID)
+        {
+            try
+            {
+                var res = _postRespository.FindAll().Where(c => c.UserID == userID);
+                return new MessageData { Data = res, Des = "Get success" };
+            }
+            catch
+            {
+                return new MessageData { Data = null, Des = "Get failed" };
+            }
+        }
+
+        public MessageData UpdatePost(int PostID, CreateNewPost request, int userID)
+        {
+            try
+            {
+                var postUpdate = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
+                if(postUpdate == null)
+                {
+                    return new MessageData { Data = null, Des = "Can't not find post" };
+                }    
+                if(request.Image != null && request.Image.FileName != postUpdate.Image)
+                {
+                    var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
+                    using(FileStream fileStream = File.Create(_webhost.WebRootPath + "\\posts\\images\\" + date + request.Image.FileName))
+                    {
+                        request.Image.CopyTo(fileStream);
+                        fileStream.Flush();
+                    }
+                    postUpdate.Image = "posts/images/" + date + request.Image.FileName;      
+                }    
+                postUpdate.TagID = request.TagID;
+                postUpdate.Title = request.Title;
+                postUpdate.Content = request.Content;
+                postUpdate.UserID = userID;
+                _postRespository.UpdateByEntity(postUpdate);
+                _postRespository.SaveChange();
+                return new MessageData { Data = postUpdate, Des = "Update successfully" };
+            }
+            catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = "update failed" };
+            }
+        }
+
+        public MessageData GetPostByTag(int tagID)
+        {
+            try
+            {
+                var res = _postRespository.FindAll().Where(p => p.TagID == tagID);
+                return new MessageData { Data = res, Des = $"Find all post with tagID = {tagID} successfully" };
+            }
+            catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = "Find faild" };
             }
         }
     }

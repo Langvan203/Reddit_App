@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reddit_App.Common;
@@ -28,7 +29,7 @@ namespace Reddit_App.Controllers
         {
             try
             {
-                var res = _postServices.AddNewProduct(request, 1);
+                var res = _postServices.AddNewPost(request, UserIDLogined);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch(Exception ex)
@@ -47,6 +48,49 @@ namespace Reddit_App.Controllers
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+        [HttpGet]
+        [Route("GetPostByUserID")]
+        public MessageData GetPostByUserID()
+        {
+            try
+            {
+                var res = _postServices.GetPostByUser(UserIDLogined);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+        [HttpPut]
+        [Route("UpdatePost")]
+        [Authorize(Roles ="Admin")]
+        public MessageData UpdatePost(int postid, [FromForm] CreateNewPost request)
+        {
+            try
+            {
+                var res = _postServices.UpdatePost(postid, request, UserIDLogined);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+        [HttpGet]
+        [Route("GetPostByTag")]
+        public MessageData GetPostByTag(int tagID)
+        {
+            try
+            {
+                var res = _postServices.GetPostByTag(tagID);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
             {
                 return NG(ex);
             }

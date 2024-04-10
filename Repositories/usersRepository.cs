@@ -19,7 +19,7 @@ namespace Reddit_App.Repositories
             try
             {
                 //var passwordbyMD5 = "admin";
-                return Model.Where(c => c.UserName == userloginRequest.UserName && c.PassWord == "admin").FirstOrDefault();
+                return Model.Where(c => c.UserName == userloginRequest.UserName && c.PassWord == userloginRequest.PassWord).FirstOrDefault();
             }
             catch(Exception ex)
             {

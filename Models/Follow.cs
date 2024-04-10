@@ -5,5 +5,7 @@
         public int FollowerID { get; set; }
 
         public int FollowedID { get; set; }
+
+        // will add status field
     }
 }
