@@ -14,10 +14,12 @@ namespace Reddit_App.Services
         private readonly PostRespository _postRespository;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webhost;
+        private readonly ApiOptions _apiOptions;
 
-        public PostServices(DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webhost)
+        public PostServices(ApiOptions apiOptions,DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webhost)
         {
-            _postRespository = new PostRespository(dbContext, mapper);
+            _postRespository = new PostRespository(apiOptions,dbContext, mapper);
+            _apiOptions = apiOptions;
             _mapper = mapper; 
             _webhost = webhost;
         }
@@ -46,6 +48,18 @@ namespace Reddit_App.Services
             catch
             {
                 return new MessageData { Data = null, Des = "Fail to add new post" };
+            }
+        }
+        public MessageData GetAllPost()
+        {
+            try
+            {
+                var res = _postRespository.FindAll();
+                return new MessageData { Data = res, Des = "Get all post" };
+            }
+            catch
+            {
+                return new MessageData { Data = null, Des = "get all post failed" };
             }
         }
     }

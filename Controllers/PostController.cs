@@ -15,10 +15,10 @@ namespace Reddit_App.Controllers
     {
         private readonly PostServices _postServices;
         private readonly IMapper _mapper;
-        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost)
+        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions)
         {
             _mapper = mapper;
-            _postServices = new PostServices(dbcontext, mapper, webHost);
+            _postServices = new PostServices(apiOptions, dbcontext, mapper, webHost);
         }
 
         //Create new post 
@@ -32,6 +32,21 @@ namespace Reddit_App.Controllers
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+        // get list post
+        [HttpGet]
+        [Route("GetListPost")]
+        public MessageData GetAllPost()
+        {
+            try
+            {
+                var res = _postServices.GetAllPost();
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch (Exception ex)
             {
                 return NG(ex);
             }

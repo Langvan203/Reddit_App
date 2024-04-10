@@ -28,15 +28,18 @@ namespace Reddit_App.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //if(!optionsBuilder.IsConfigured)
-            //{
-            //    var sqlConnection = "Data Source=LANGVAN;Initial Catalog=Reddit_App;Integrated Security=True;Trust Server Certificate=True";
-            //    optionsBuilder.UseSqlServer(sqlConnection);
-            //}    
+            if (!optionsBuilder.IsConfigured)
+            {
+                //var sqlConnection = "Data Source=SQL5113.site4now.net;Initial Catalog=db_aa7602_vl203;User Id=db_aa7602_vl203_admin;Password=van321pro@";
+                var sqlConnection = "Data Source=LANGVAN;Initial Catalog=Reddit_App;Integrated Security=True;Trust Server Certificate=True";
+                optionsBuilder.UseSqlServer(sqlConnection);
+            }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Follow>().HasNoKey();
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
             base.OnModelCreating(modelBuilder);
         }
     }

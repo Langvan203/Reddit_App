@@ -13,11 +13,13 @@ namespace Reddit_App.Repositories
 
         protected DatabaseContext DbContext { get; set; }
 
+        protected ApiOptions ApiOptions { get; set; }
 
-        public BaseRespository(DatabaseContext databaseContext)
+        public BaseRespository(ApiOptions apiConfig,DatabaseContext databaseContext)
         {
             DbContext = databaseContext;
             Model = databaseContext.Set<T>();
+            ApiOptions = apiConfig;
         }
         public T Create(T entity)
         {
@@ -45,10 +47,6 @@ namespace Reddit_App.Repositories
             }
         }
 
-        public IQueryable<T> FillAll()
-        {
-            return Model.AsNoTracking();
-        }
 
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
@@ -81,6 +79,11 @@ namespace Reddit_App.Repositories
         public async Task SaveChangeAsync()
         {
             await DbContext.SaveChangesAsync();
+        }
+
+        public IQueryable<T> FindAll()
+        {
+            return Model.AsNoTracking();
         }
     }
 }

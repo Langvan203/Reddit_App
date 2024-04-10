@@ -4,7 +4,7 @@ namespace Reddit_App.Repository
 {
     interface IRespositoryBase<T>
     {
-        IQueryable<T> FillAll();
+        IQueryable<T> FindAll();
         IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression);
 
         T Create(T entity);

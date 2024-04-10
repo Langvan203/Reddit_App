@@ -1,15 +1,27 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Reddit_App.Dto;
+using System.Security.Claims;
 
 namespace Reddit_App.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Produces("application/json")]
+    [ActionFilter]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BaseApiController<T> : ControllerBase where T : BaseApiController<T>    
     {
+        public int UserIDLogined
+        {
+            get
+            {
+                return int.Parse(this.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)?.Value);
+            }
+        }
+
         protected MessageData NG(Exception ex)
         {
             var response = new MessageData { Data = null, Code = "Error", Des = ex.Message, Status = -2 };
