@@ -10,6 +10,7 @@ namespace Reddit_App.Mapper
         public MappingContext()
         {
             CreateMap<CreateNewPost, Post>();
+            CreateMap<UpdateUserInfoRequest, users>();
         } 
     }
 }

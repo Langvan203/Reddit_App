@@ -6,6 +6,7 @@ using Reddit_App.Repositories;
 using Reddit_App.Request;
 using System.Net.WebSockets;
 using Reddit_App.Models;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Reddit_App.Services
 {
@@ -119,6 +120,19 @@ namespace Reddit_App.Services
             catch(Exception ex)
             {
                 return new MessageData { Data = null, Des = "Find faild" };
+            }
+        }
+
+        public MessageData GetPostByContent(string content)
+        {
+            try
+            {
+                var res = _postRespository.FindByCondition(p => p.Content.Contains(content));
+                return new MessageData { Data = res, Des = "Get post by conten success" };
+            }
+            catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = "Get post fail" };
             }
         }
     }

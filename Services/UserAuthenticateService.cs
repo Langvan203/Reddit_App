@@ -46,9 +46,8 @@ namespace Reddit_App.Services
                 if (user.UserName == "admin" && user.PassWord == "admin")
                 {
                     var newClaimList = claimList.ToList();
-                    newClaimList.RemoveAll(claim => claim.Type == ClaimTypes.Role && claim.Value == "User");
+                    //newClaimList.RemoveAll(claim => claim.Type == ClaimTypes.Role && claim.Value == "User");
                     newClaimList.Add(new Claim(ClaimTypes.Role, "Admin"));
-
                     // renew claim
                     claimList = newClaimList.ToArray();
                 }
