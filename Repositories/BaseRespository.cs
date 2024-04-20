@@ -85,5 +85,10 @@ namespace Reddit_App.Repositories
         {
             return Model.AsNoTracking();
         }
+
+        public IQueryable<IGrouping<TKey, T>> GroupBy<TKey>(Expression<Func<T, TKey>> keySelector)
+        {
+            return DbContext.Set<T>().GroupBy(keySelector);
+        }
     }
 }

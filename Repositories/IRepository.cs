@@ -12,5 +12,7 @@ namespace Reddit_App.Repository
         T UpdateByEntity(T entity);
 
         bool DeleteByEntity(T entity);
+
+        IQueryable<IGrouping<TKey, T>> GroupBy<TKey>(Expression<Func<T, TKey>> keySelector);
     }
 }

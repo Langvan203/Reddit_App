@@ -38,20 +38,19 @@ namespace Reddit_App.Controllers
         }
 
 
-        // will fix
-        //[HttpGet]
-        //[Route("GetNumberFollow")]
-        //public async Task<MessageData> GetNumberFollow()
-        //{
-        //    try
-        //    {
-        //        var res = _followServices.GetNumberFollow(UserIDLogined);
-        //        return new MessageData { Data = res, Des = "get succesfull" };
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        return NG(ex);
-        //    }
-        //}
+        [HttpGet]
+        [Route("GetNumberFollow")]
+        public MessageData GetNumberFollow()
+        {
+            try
+            {
+                var res = _followServices.GetNumberFollow(UserIDLogined);
+                return new MessageData { Data = res, Des = "get succesfull" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
     }
 }

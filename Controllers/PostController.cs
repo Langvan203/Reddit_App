@@ -52,6 +52,21 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
+
+        [HttpGet]
+        [Route("GetPostByTag")]
+        public MessageData GetPostByTag(int tagID)
+        {
+            try
+            {
+                var res = _postServices.GetPostByTag(tagID);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
         [HttpGet]
         [Route("GetPostByUserID")]
         public MessageData GetPostByUserID()
@@ -69,11 +84,11 @@ namespace Reddit_App.Controllers
         [HttpPut]
         [Route("UpdatePost")]
         [Authorize(Roles ="Admin")]
-        public MessageData UpdatePost(int postid, [FromForm] CreateNewPost request)
+        public MessageData UpdatePost([FromForm] UpdatePostRequest request)
         {
             try
             {
-                var res = _postServices.UpdatePost(postid, request, UserIDLogined);
+                var res = _postServices.UpdatePost(request, UserIDLogined);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch(Exception ex)
@@ -81,19 +96,6 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
-        [HttpGet]
-        [Route("GetPostByTag")]
-        public MessageData GetPostByTag(int tagID)
-        {
-            try
-            {
-                var res = _postServices.GetPostByTag(tagID);
-                return new MessageData { Data = res.Data, Des = res.Des };
-            }
-            catch(Exception ex)
-            {
-                return NG(ex);
-            }
-        }
+        
     }
 }

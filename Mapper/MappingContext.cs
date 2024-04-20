@@ -11,6 +11,9 @@ namespace Reddit_App.Mapper
         {
             CreateMap<CreateNewPost, Post>();
             CreateMap<UpdateUserInfoRequest, users>();
+            CreateMap<UpdatePostRequest, Post>();
+            CreateMap<LikeRequest, Like>();
+            CreateMap<NewFollowRequest, Follow>();
         } 
     }
 }

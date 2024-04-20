@@ -77,11 +77,11 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData UpdatePost(int PostID, CreateNewPost request, int userID)
+        public MessageData UpdatePost(UpdatePostRequest request,int userID)
         {
             try
             {
-                var postUpdate = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
+                var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID).FirstOrDefault();
                 if(postUpdate == null)
                 {
                     return new MessageData { Data = null, Des = "Can't not find post" };
@@ -133,6 +133,28 @@ namespace Reddit_App.Services
             catch(Exception ex)
             {
                 return new MessageData { Data = null, Des = "Get post fail" };
+            }
+        }
+
+        public MessageData DeletePostByID(int PostID)
+        {
+            try
+            {
+                var res = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
+                if(res == null)
+                {
+                    return new MessageData { Data = null, Des = "Can't not find post" };
+                }    
+                else
+                {
+                    _postRespository.DeleteByEntity(res);
+                    _postRespository.SaveChange();
+                    return new MessageData { Data = res, Des = "Delete post successful" };
+                }    
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
     }
