@@ -46,7 +46,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _userAuthenticateService.UserRegister(request);
-                return new MessageData { Data = res, Des = "Register succesfully" };
+                return new MessageData { Data = res.Data, Des = res.Des  };
             }
             catch(Exception ex)
             {

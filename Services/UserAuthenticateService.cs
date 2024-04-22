@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Reddit_App.Common;
 using Reddit_App.Database;
+using Reddit_App.Dto;
 using Reddit_App.Models;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
@@ -71,51 +72,31 @@ namespace Reddit_App.Services
             }
         }
 
-        public object UserRegister(UserRegisterRequest request)
+        public MessageData UserRegister(UserRegisterRequest request)
         {
             try
             {
-                var user = _userRepository.FindByCondition(r => r.UserName == request.UserName).FirstOrDefault();
-                if(user != null)
+                var findUser = _userRepository.FindByCondition(r => r.UserName == request.UserName).FirstOrDefault();
+                if(findUser != null)
                 {
-                    throw new Exception("Username has been used");
+                    return new MessageData { Data = null, Des = "User name has been used" };
                 }
                 var newUser = new users()
                 {
                     UserName = request.UserName,
-                    PassWord = request.PassWord,
+                    PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord),
                     Email = request.Email,
-                    DateOfBirth = request.DateOfBirth
+                    DateOfBirth = request.DateOfBirth,
+                    Role = "User"
                 };
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();
 
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_apiOption.Secret));
-                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-                var claimList = new[]
-                {
-                    new Claim(ClaimTypes.Role, "User"),
-                    new Claim(ClaimTypes.UserData, newUser.UserName),
-                    new Claim(ClaimTypes.Sid, newUser.UserID.ToString()),
-                };
-
-                var token = new JwtSecurityToken(
-                    issuer: _apiOption.ValidIssuer,
-                    audience: _apiOption.ValidAudience,
-                    expires: DateTime.Now.AddDays(1),
-                    claims: claimList,
-                    signingCredentials: credentials
-                    );
-
-                var tokenByString = new JwtSecurityTokenHandler().WriteToken(token);
-                return new {
-                    token = tokenByString,
-                    user = newUser
-                };
+                return new MessageData { Data = newUser, Des = "Register successfull" };
             }
             catch(Exception ex)
             {
-                throw ex;
+                return new MessageData { Data = null, Des = ex.ToString()};
             }
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SignalRChat.Hubs;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -98,7 +99,9 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 
+// add SignalR to process real-time beetwen client-sever
 
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -129,6 +132,8 @@ app.UseSwaggerUI(c =>
     c.DocumentTitle = "Reddit APP API";
     c.RoutePrefix = string.Empty;
 });
+
+app.MapHub<DetectNewEvent>("/notificationHub");
 
 app.UseHttpsRedirection();
 

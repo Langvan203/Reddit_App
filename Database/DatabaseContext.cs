@@ -30,7 +30,7 @@ namespace Reddit_App.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //var sqlConnection = "Data Source=SQL5113.site4now.net;Initial Catalog=db_aa7602_vl203;User Id=db_aa7602_vl203_admin;Password=van321pro@";
+                //var sqlConnection = "Data Source = SQL5113.site4now.net; Initial Catalog = db_aa7602_redditapp; User Id = db_aa7602_redditapp_admin; Password = van321pro@";
                 var sqlConnection = "Data Source=LANGVAN;Initial Catalog=Reddit_App;Integrated Security=True;Trust Server Certificate=True";
                 optionsBuilder.UseSqlServer(sqlConnection);
             }

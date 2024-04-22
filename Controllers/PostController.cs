@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
 using Reddit_App.Request;
 using Reddit_App.Services;
-
+using SignalRChat.Hubs;
+ 
 namespace Reddit_App.Controllers
 {
     [Route("api/[controller]")]
@@ -16,13 +18,17 @@ namespace Reddit_App.Controllers
     {
         private readonly PostServices _postServices;
         private readonly IMapper _mapper;
-        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions)
+        private readonly IHubContext<DetectNewEvent> _hubContext;
+        //private readonly HttpClient _httpClient;
+        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions, IHubContext<DetectNewEvent> hubContext)
         {
             _mapper = mapper;
+            _hubContext = hubContext;
             _postServices = new PostServices(apiOptions, dbcontext, mapper, webHost);
+            //_httpClient = httpClient;
         }
 
-        //Create new post 
+         //Create new post 
         [HttpPost]
         [Route("CreateNewPost")]
         public MessageData AddNewPosts([FromForm] CreateNewPost request)
@@ -30,6 +36,9 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.AddNewPost(request, UserIDLogined);
+                //await _hubContext.Clients.All.SendAsync("ReceiveNotification", "A new post has been added.");
+                _hubContext.Clients.All.SendAsync("ReceiveNotification", "Có bài viết mới được tạo.");
+                //var response = await _httpClient.PostAsync("https://localhost:7036/api/Notification/CreateNewNoti", null);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch(Exception ex)
