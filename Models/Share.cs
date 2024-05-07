@@ -11,5 +11,6 @@ namespace Reddit_App.Models
 
         public int PostID { get; set; }
 
+        public int ShareStatus { get; set; }
     }
 }

@@ -4,6 +4,5 @@
     {
         public int PostID { get; set; }
 
-        public bool status { get; set; }
     }
 }

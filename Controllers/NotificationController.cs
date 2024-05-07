@@ -6,7 +6,6 @@ using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
 using Reddit_App.Services;
-using SignalRChat.Hubs;
 
 namespace Reddit_App.Controllers
 {
@@ -16,14 +15,13 @@ namespace Reddit_App.Controllers
     {
         private readonly NotificationServices _notiServices;
         private readonly IMapper _mapper;
-        private readonly IHubContext<DetectNewEvent> _hubContext;
+        
         private readonly HttpClient _httpClient;
-        public NotificationController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions, IHubContext<DetectNewEvent> hubContext, HttpClient httpClient)
+        public NotificationController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions)
         {
             _mapper = mapper;
-            _hubContext = hubContext;
             _notiServices = new NotificationServices(apiOptions, mapper, webHost, dbcontext);
-            _httpClient = httpClient;
+          
         }
 
         [HttpPost]

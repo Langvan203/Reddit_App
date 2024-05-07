@@ -16,5 +16,6 @@ namespace Reddit_App.Models
         public int UserID { get; set; }
 
         public int TagID { get; set; }
+
     }
 }

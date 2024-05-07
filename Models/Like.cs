@@ -11,7 +11,7 @@ namespace Reddit_App.Models
 
         public int PostID { get; set; }
 
-        public bool LikeStatus { get; set; }
+        public int LikeStatus { get; set; }
 
     }
 }

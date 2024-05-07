@@ -7,7 +7,10 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using SignalRChat.Hubs;
+using System.Net.WebSockets;
+using System.Net;
+using Reddit_App.Websockets;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -99,9 +102,6 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 
-// add SignalR to process real-time beetwen client-sever
-
-builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -122,6 +122,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// add websocket
+
+
+
 // swaggerUI
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -133,7 +137,7 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-app.MapHub<DetectNewEvent>("/notificationHub");
+//app.MapHub<DetectNewEvent>("/notificationHub");
 
 app.UseHttpsRedirection();
 

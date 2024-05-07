@@ -12,5 +12,7 @@ namespace Reddit_App.Models
         public string Content { get; set; }
 
         public int UserID { get; set; }
+
+        public int CommentStatus { get; set; }
     }
 }

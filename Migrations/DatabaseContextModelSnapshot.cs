@@ -30,6 +30,9 @@ namespace Reddit_App.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentID"), 1L, 1);
 
+                    b.Property<int>("CommentStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -47,11 +50,24 @@ namespace Reddit_App.Migrations
 
             modelBuilder.Entity("Reddit_App.Models.Follow", b =>
                 {
+                    b.Property<int>("IDFollow")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IDFollow"), 1L, 1);
+
                     b.Property<int>("FollowedID")
                         .HasColumnType("int");
 
                     b.Property<int>("FollowerID")
                         .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("IDFollow");
+
+                    b.HasIndex("IDFollow");
 
                     b.ToTable("Follows");
                 });
@@ -64,8 +80,8 @@ namespace Reddit_App.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeID"), 1L, 1);
 
-                    b.Property<bool>("LikeStatus")
-                        .HasColumnType("bit");
+                    b.Property<int>("LikeStatus")
+                        .HasColumnType("int");
 
                     b.Property<int>("PostID")
                         .HasColumnType("int");
@@ -138,6 +154,9 @@ namespace Reddit_App.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShareID"), 1L, 1);
 
                     b.Property<int>("PostID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShareStatus")
                         .HasColumnType("int");
 
                     b.Property<int>("UserID")

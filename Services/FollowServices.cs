@@ -24,14 +24,20 @@ namespace Reddit_App.Services
 
         public MessageData AddNewFollow(int userID_er, NewFollowRequest request)
         {
-            // userID_er là người thực hiện follow;
-            //request là người được chọn follow;
             try
             {
-                var newFollow = _mapper.Map<Follow>(request);
-                _followRespository.Create(newFollow);
-                _followRespository.SaveChange();
-                return new MessageData { Data = newFollow , Des = "follow success"};
+                
+                var temp = _followRespository.FindByCondition(e => e.FollowerID == userID_er && e.FollowedID == request.FollowedID && e.Status == 1).FirstOrDefault();
+                if(temp == null)
+                {
+                    var newFollow = _mapper.Map<Follow>(request);
+                    newFollow.FollowerID = userID_er;
+                    newFollow.Status = 1;
+                    _followRespository.Create(newFollow);
+                    _followRespository.SaveChange();
+                    return new MessageData { Data = newFollow, Des = "follow success" };
+                }
+                return new MessageData { Data = null, Des = "Da thuc hien follow nguoi nay" };
             }
             catch
             {
@@ -42,7 +48,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _followRespository.FindAll().Where(f => f.FollowerID == UserID_er);
+                var res = _followRespository.FindAll().Where(f => f.FollowerID == UserID_er && f.Status == 1);
                 return new MessageData { Data = res, Des = "Get list follow succes" };
             }
             catch
@@ -51,20 +57,19 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData UnFollow(int UserID_er, int UserID_ed)
+        public MessageData UnFollow(int UserID_er, NewFollowRequest request)
         {
-            // UserID_er là người được follow
-            // UserID_ed là người thực hiện follow
             try
             {
-                var res = _followRespository.FindByCondition(u => u.FollowerID == UserID_er && u.FollowedID == UserID_ed).FirstOrDefault();
+                var res = _followRespository.FindByCondition(u => u.FollowerID == UserID_er && u.FollowedID == request.FollowedID && u.Status == 1).FirstOrDefault();
                 if(res == null)
                 {
                     return new MessageData { Data = null, Des = "Error" };
                 }    
                 else
                 {
-                    _followRespository.DeleteByEntity(res);
+                    res.Status = 0;
+                    _followRespository.UpdateByEntity(res);
                     _followRespository.SaveChange();
                     return new MessageData { Data = res, Des = "Unfollow success" };
                 }    
@@ -75,12 +80,11 @@ namespace Reddit_App.Services
             }
         }
 
-        // will fix
         public MessageData GetNumberFollow(int userID_er)
         {
             try
             {
-                var numberFollower = _followRespository.FindByCondition(c => c.FollowerID == userID_er).GroupBy(c => c.FollowerID).Select(g => new
+                var numberFollower = _followRespository.FindByCondition(c => c.FollowerID == userID_er && c.Status == 1).GroupBy(c => c.FollowerID).Select(g => new
                 {
                     IDNguoiDuocFollow = g.Key,
                     SoLuongFollow = g.Count()

@@ -81,7 +81,8 @@ namespace Reddit_App.Services
         {
             try
             {
-                var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID).FirstOrDefault();
+                // kiểm tra xem nếu user đó là người đăng bài thì mới cho phép cập nhật lại bài viết của mình
+                var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID && p.UserID == userID).FirstOrDefault();
                 if(postUpdate == null)
                 {
                     return new MessageData { Data = null, Des = "Can't not find post" };
@@ -157,5 +158,6 @@ namespace Reddit_App.Services
                 throw ex;
             }
         }
+
     }
 }

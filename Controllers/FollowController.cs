@@ -6,6 +6,7 @@ using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
 using Reddit_App.Models;
+using Reddit_App.Request;
 using Reddit_App.Services;
 
 namespace Reddit_App.Controllers
@@ -29,7 +30,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _followServices.GetAllFollow(UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res.Data, Des = "get all follow success"};
             }
             catch(Exception ex)
             {
@@ -45,9 +46,40 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _followServices.GetNumberFollow(UserIDLogined);
-                return new MessageData { Data = res, Des = "get succesfull" };
+                return new MessageData { Data = res.Data, Des = "get succesfull" };
             }
             catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpPost]
+        [Route("AddNewFollow")]
+
+        public MessageData AddFollow(NewFollowRequest request)
+        {
+            try
+            {
+                var res = _followServices.AddNewFollow(UserIDLogined, request);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception e)
+            {
+                return NG(e);
+            }
+        }
+
+        [HttpPost]
+        [Route("Unfollow")]
+        public MessageData Unfollow(NewFollowRequest request)
+        {
+            try
+            {
+                var res = _followServices.UnFollow(UserIDLogined, request);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
             {
                 return NG(ex);
             }

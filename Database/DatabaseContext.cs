@@ -37,7 +37,7 @@ namespace Reddit_App.Database
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Follow>().HasNoKey();
+            modelBuilder.Entity<Follow>().HasIndex(e => e.IDFollow);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
             base.OnModelCreating(modelBuilder);
