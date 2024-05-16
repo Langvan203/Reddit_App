@@ -27,17 +27,12 @@ namespace Reddit_App.Services
         {
             try
             {
-                var checkComment = _commentRepository.FindByCondition(m => m.PostID == request.PostID && m.UserID == UserLogined && m.CommentStatus == 1).FirstOrDefault();
-                if (checkComment == null)
-                {
-                    var newComment = _mapper.Map<Comment>(request);
-                    newComment.CommentStatus = 1;
-                    newComment.UserID = UserLogined;
-                    _commentRepository.Create(newComment);
-                    _commentRepository.SaveChange();
-                    return new MessageData { Data = newComment, Des = "Add new comment success" };
-                }
-                return new MessageData { Data = null, Des = "Comment already exists" };
+                var newComment = _mapper.Map<Comment>(request);
+                newComment.CommentStatus = 1;
+                newComment.UserID = UserLogined;
+                _commentRepository.Create(newComment);
+                _commentRepository.SaveChange();
+                return new MessageData { Data = newComment, Des = "Add new comment success" };
             }
             catch (Exception ex)
             {
@@ -49,7 +44,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var listComment = _commentRepository.FindByCondition(m => m.PostID == PostID).Select(l => new
+                var listComment = _commentRepository.FindByCondition(m => m.PostID == PostID && m.CommentStatus == 1).Select(l => new
                 {
                     UserID = l.UserID,
                     Content = l.Content
@@ -66,7 +61,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var totalComment = _commentRepository.FindByCondition(m => m.PostID == PostID).GroupBy(m => m.PostID).Select(l => new
+                var totalComment = _commentRepository.FindByCondition(m => m.PostID == PostID && m.CommentStatus == 1).GroupBy(m => m.PostID).Select(l => new
                 {
                     PostID = l.Key,
                     TotalComment = l.Count()
@@ -100,6 +95,29 @@ namespace Reddit_App.Services
             {
                 return new MessageData { Data = null, Des = "Error when update comment" };
             }
-        } 
+        }
+        
+        public MessageData DeleteComment(int UserLogined, NewCommentRequest request)
+        {
+            try
+            {
+                
+                var dComment = _commentRepository.FindByCondition(m => m.UserID == UserLogined && m.PostID == request.PostID && m.CommentStatus == 1).FirstOrDefault();
+                if(dComment != null)
+                {
+                    dComment.CommentStatus = 0;
+                    _commentRepository.UpdateByEntity(dComment);
+                    _commentRepository.SaveChange();
+                    return new MessageData { Data = dComment, Des = "Delete comment succes" };
+                }
+                return new MessageData { Data = null, Des = "Can't find comment" };
+            }
+            catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = ex.Message};
+            }
+        }
+
+        
     }
 }

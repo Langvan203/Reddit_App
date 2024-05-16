@@ -14,5 +14,7 @@ namespace Reddit_App.Models
         public int UserID { get; set; }
 
         public int CommentStatus { get; set; }
+
+        public string Image { get; set; }
     }
 }

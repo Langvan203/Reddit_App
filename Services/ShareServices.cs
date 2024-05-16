@@ -52,17 +52,8 @@ namespace Reddit_App.Services
         {
             try
             {
-                var lShare = _shareRepository.FindByCondition(l => l.PostID == PostID && l.ShareStatus == 1).Select(l => new
-                {
-                    ShareID = l.ShareID,
-                    UserShare = l.UserID
-                });
-                var userShare = _userRepository.FindAll().Select(l => new
-                {
-                    userShareID = lShare.Select(l => l.ShareID),
-                    UserNameShare = lShare.Select(l => l.UserShare)
-                });
-                return new MessageData { Data = userShare, Des = "Get list user share success" };
+                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID);
+                return new MessageData { Data = lShare, Des = "Get list user share success" };
             }
             catch(Exception ex)
             {
@@ -93,11 +84,11 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData GetNumberShare(ShareRequest request)
+        public MessageData GetNumberShare(int PostID)
         {
             try
             {
-                var nShare = _shareRepository.FindByCondition(s => s.PostID == request.PostID).GroupBy(l => l.PostID).Select(l => new
+                var nShare = _shareRepository.FindByCondition(s => s.PostID == PostID && s.ShareStatus == 1).GroupBy(l => l.PostID).Select(l => new
                 {
                     PostID = l.Key,
                     NumberShare = l.Count()

@@ -22,6 +22,14 @@ namespace Reddit_App.Controllers
             }
         }
 
+        public string UserNameLogined
+        {
+            get
+            {
+                return (this.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value);
+            }
+        }
+
         protected MessageData NG(Exception ex)
         {
             var response = new MessageData { Data = null, Code = "Error", Des = ex.Message, Status = -2 };

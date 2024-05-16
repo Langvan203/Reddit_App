@@ -9,7 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Net.WebSockets;
 using System.Net;
-using Reddit_App.Websockets;
+using Reddit_App.Helpers;
+using Microsoft.AspNetCore.WebSockets;
+using Reddit_App.Helpers.SocketHelper;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +104,8 @@ var mapperConfig = new MapperConfiguration(mapperConfig =>
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+//builder.Services.AddSingleton<ConnectionManager>();
+//builder.Services.AddSingleton<WebSocketHandle>();
 
 
 var app = builder.Build();
@@ -124,6 +129,15 @@ app.UseRouting();
 
 // add websocket
 
+//var webSocketOptions = new WebSocketOptions()
+//{
+//    KeepAliveInterval = TimeSpan.FromSeconds(10),
+//    ReceiveBufferSize = 4 * 1024
+//};
+
+//app.UseWebSockets(webSocketOptions);
+//var sendNoti = app.Services.GetService<SendNotiHandler>();
+//app.UseMiddleware<WebSocketMiddlewareCustom>(sendNoti);
 
 
 // swaggerUI

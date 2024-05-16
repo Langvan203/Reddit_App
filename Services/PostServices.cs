@@ -124,6 +124,7 @@ namespace Reddit_App.Services
             }
         }
 
+        // khi tìm kiếm bằng UTF-8 và khi không có thì lỗi tìm 
         public MessageData GetPostByContent(string content)
         {
             try

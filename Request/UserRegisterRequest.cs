@@ -9,5 +9,7 @@
         public string Email { get; set; }
 
         public DateTime DateOfBirth { get; set; }
+
+        public IFormFile ImageAvata { get; set; }
     }
 }

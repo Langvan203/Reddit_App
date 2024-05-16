@@ -15,6 +15,8 @@ namespace Reddit_App.Mapper
             CreateMap<LikeRequest, Like>();
             CreateMap<NewFollowRequest, Follow>();
             CreateMap<CreateNewNotifications, Notifications>();
+            CreateMap<ShareRequest, Share>();
+            CreateMap<NewCommentRequest, Comment>();
         } 
     }
 }

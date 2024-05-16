@@ -3,5 +3,6 @@
     public class ShareRequest
     {
         public int PostID { get; set; }
+
     }
 }

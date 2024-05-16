@@ -18,7 +18,7 @@ namespace Reddit_App.Controllers
 
         public CommentController(DatabaseContext dbContext, ApiOptions options, IWebHostEnvironment webHost, IMapper mapper)
         {
-            _commentservices = new CommentServices(options,dbContext, mapper, webHost);
+            _commentservices = new CommentServices(options, dbContext, mapper, webHost);
             _mapper = mapper;
         }
 
@@ -32,7 +32,7 @@ namespace Reddit_App.Controllers
                 var res = _commentservices.GetListComment(PostID);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return NG(ex);
             }
@@ -47,7 +47,7 @@ namespace Reddit_App.Controllers
                 var res = _commentservices.GetTotalComment(PostID);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return NG(ex);
             }
@@ -60,6 +60,38 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _commentservices.AddNewComment(UserIDLogined, request);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateComment")]
+        public MessageData UpdateComment(NewCommentRequest request)
+        {
+            try
+            {
+                var res = _commentservices.UpdateComment(UserIDLogined, request);
+                return new MessageData { Data = res.Data, Des = res.Des };
+
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteCommentByUser")]
+
+        public MessageData DeleteCommentByUser(NewCommentRequest request)
+        {
+            try
+            {
+                var res = _commentservices.DeleteComment(UserIDLogined, request);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch(Exception ex)

@@ -85,7 +85,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _likeRepository.FindByCondition(l => l.PostID == request.PostID).GroupBy(l => l.PostID).Select(l => new
+                var res = _likeRepository.FindByCondition(l => l.PostID == request.PostID && l.LikeStatus == 1).GroupBy(l => l.PostID).Select(l => new
                 {
                     PostID = l.Key,
                     LikeNumber = l.Count()
