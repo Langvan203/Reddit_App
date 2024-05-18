@@ -10,6 +10,6 @@
 
         public DateTime DateOfBirth { get; set; }
 
-        public IFormFile ImageAvata { get; set; }
+        public IFormFile? ImageAvata { get; set; }
     }
 }

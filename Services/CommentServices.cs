@@ -5,6 +5,7 @@ using Reddit_App.Dto;
 using Reddit_App.Models;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
+using MySqlConnector.Authentication;
 
 namespace Reddit_App.Services
 {

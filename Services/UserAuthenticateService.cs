@@ -81,22 +81,19 @@ namespace Reddit_App.Services
                 {
                     return new MessageData { Data = null, Des = "User name has been used" };
                 }
+
                 var newUser = new users()
                 {
                     UserName = request.UserName,
                     PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord),
                     Email = request.Email,
-                    DateOfBirth = request.DateOfBirth,
+                    DateOfBirth = DateTime.Now,
                     Role = "User",
-                    Status = true
+                    Status = true,
+                    Image = ""
                 };
-                //if(newUser.UserName == "lvan123")
-                //{
-                //    newUser.Role = "Admin";
-                //}   
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();
-
                 return new MessageData { Data = newUser, Des = "Register successfull" };
             }
             catch(Exception ex)

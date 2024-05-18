@@ -12,6 +12,7 @@ using System.Net;
 using Reddit_App.Helpers;
 using Microsoft.AspNetCore.WebSockets;
 using Reddit_App.Helpers.SocketHelper;
+using Reddit_App.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,9 +105,14 @@ var mapperConfig = new MapperConfiguration(mapperConfig =>
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
-//builder.Services.AddSingleton<ConnectionManager>();
-//builder.Services.AddSingleton<WebSocketHandle>();
+builder.Services.AddSingleton<WebSocketHandle>(provider =>
+{
+    var connectionManager = provider.GetRequiredService<ConnectionManager>();
+    return new WebSocketHandle(connectionManager);
+});
 
+
+builder.Services.AddSingleton<SendNotificationRepository, SendNotificationServices>();
 
 var app = builder.Build();
 
@@ -138,6 +144,7 @@ app.UseRouting();
 //app.UseWebSockets(webSocketOptions);
 //var sendNoti = app.Services.GetService<SendNotiHandler>();
 //app.UseMiddleware<WebSocketMiddlewareCustom>(sendNoti);
+
 
 
 // swaggerUI

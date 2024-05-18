@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Reddit_App.Helpers.SocketHelper
 {
-    public abstract class WebSocketHandle
+    public class WebSocketHandle
     {
-        protected ConnectionManager ConnectionManager { get; set; }
+        public ConnectionManager ConnectionManager { get; set; }
 
         public WebSocketHandle(ConnectionManager connectionManager)
         {

@@ -41,7 +41,7 @@ namespace Reddit_App.Controllers
         [AllowAnonymous]
         [Route("UserRegister")]
 
-        public MessageData UserRegister(UserRegisterRequest request)
+        public MessageData UserRegister([FromForm]UserRegisterRequest request)
         {
             try
             {

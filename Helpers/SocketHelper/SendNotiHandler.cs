@@ -1,4 +1,6 @@
-﻿namespace Reddit_App.Helpers.SocketHelper
+﻿using static Microsoft.AspNetCore.Http.WebSocketManager;
+
+namespace Reddit_App.Helpers.SocketHelper
 {
     public class SendNotiHandler : WebSocketHandle
     {
