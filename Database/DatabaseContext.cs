@@ -41,6 +41,12 @@ namespace Reddit_App.Database
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
             base.OnModelCreating(modelBuilder);
+
+
+            modelBuilder.Entity<users>(entity =>
+            {
+                entity.Property(e => e.Image).IsRequired(false);
+            });
         }
     }
 }
