@@ -9,5 +9,7 @@
 
         public DateTime DateOfBirth { get; set; }
 
+        public IFormFile Avata { get; set; }
+
     }
 }

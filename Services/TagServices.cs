@@ -45,11 +45,25 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData RemoveTag(TagRequest request)
+
+        public MessageData GetListTag()
         {
             try
             {
-                var res = _tagRepos.FindByCondition(r => r.TagName == request.TagName).FirstOrDefault();
+                var res = _tagRepos.FindAll();
+                return new MessageData { Data = res, Des = "Get list tag success" };
+            }
+            catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = "Error get tag" };
+            }
+        }
+
+        public MessageData RemoveTag(int TagID)
+        {
+            try
+            {
+                var res = _tagRepos.FindByCondition(r => r.TagID == TagID).FirstOrDefault();
                 if (res != null)
                 {
                     _tagRepos.DeleteByEntity(res);

@@ -52,21 +52,6 @@ namespace Reddit_App.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("UnShare")]
-        public MessageData UnShare(ShareRequest request)
-        {
-            try
-            {
-                var res = _shareServices.UnShare(UserIDLogined,request);
-                return new MessageData { Data = res.Data, Des = res.Des };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        }
-
         [HttpGet]
         [Route("GetTotalShare")]
         public MessageData GetTotalShare(int PostID)

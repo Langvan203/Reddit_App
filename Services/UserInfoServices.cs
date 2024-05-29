@@ -4,6 +4,7 @@ using Reddit_App.Database;
 using Reddit_App.Dto;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
+using System.IO;
 
 namespace Reddit_App.Services
 {
@@ -35,8 +36,19 @@ namespace Reddit_App.Services
                 {
                     var checkUserName = _usersRepository.FindByCondition(u => u.UserName == request.UserName).FirstOrDefault();
                     var checkEmail = _usersRepository.FindByCondition(u => u.Email == request.Email).FirstOrDefault();
+
                     if(checkUserName != null && checkEmail != null)
                     {
+                        if(request.Avata != null && request.Avata.FileName != res.Image)
+                        {
+                            var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
+                            using (FileStream fileStream = File.Create(_webHost.WebRootPath + "\\avata\\images" + date + request.Avata.FileName))
+                            {
+                                request.Avata.CopyTo(fileStream);
+                                fileStream.Flush();
+                            }
+                            res.Image = "/avata/images" + date + request.Avata.FileName;
+                        }    
                         res.PassWord = request.PassWord;
                         res.Email = request.Email;
                         res.DateOfBirth = request.DateOfBirth;
@@ -61,7 +73,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _usersRepository.FindAll();
+                var res = _usersRepository.FindByCondition(u => u.UserID == UserLoginID).FirstOrDefault();
                 return new MessageData { Data = res, Des = "Get user profile success" };
             }
             catch(Exception ex)

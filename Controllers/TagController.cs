@@ -35,5 +35,35 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
+
+        [HttpGet]
+        [Route("GetListTag")]
+        public MessageData GetListTag()
+        {
+            try
+            {
+                var res = _tagServices.GetListTag();
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteTag")]
+        public MessageData RemoveTag(int TagID)
+        {
+            try
+            {
+                var res = _tagServices.RemoveTag(TagID);
+                return new MessageData { Data = res.Data, Des = res.Des };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
     }
 }

@@ -23,11 +23,11 @@ namespace Reddit_App.Controllers
 
         [HttpGet]
         [Route("GetListLike")]
-        public MessageData GetListLike(LikeRequest request)
+        public MessageData GetListLike(int postID)
         {
             try
             {
-                var res = _likeServices.getListLike(request);
+                var res = _likeServices.getListLike(postID);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch (Exception ex)
@@ -37,11 +37,11 @@ namespace Reddit_App.Controllers
         }
         [HttpGet]
         [Route("GetNumberLike")]
-        public MessageData GetNumberLike(LikeRequest request)
+        public MessageData GetNumberLike(int postID)
         {
             try
             {
-                var res = _likeServices.getNumberLikePost(request);
+                var res = _likeServices.getNumberLikePost(postID);
                 return new MessageData { Data = res.Data, Des = res.Des };
             }
             catch (Exception ex)
@@ -64,19 +64,19 @@ namespace Reddit_App.Controllers
                 return NG(e);
             }
         }
-        [HttpPost]
-        [Route("DisLikePost")]
-        public MessageData DisLikePost(LikeRequest request)
-        {
-            try
-            {
-                var res = _likeServices.DisLike(request, UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        } 
+        //[HttpPost]
+        //[Route("DisLikePost")]
+        //public MessageData DisLikePost(LikeRequest request)
+        //{
+        //    try
+        //    {
+        //        var res = _likeServices.DisLike(request, UserIDLogined);
+        //        return new MessageData { Data = res.Data, Des = res.Des };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return NG(ex);
+        //    }
+        //} 
     }
 }

@@ -26,7 +26,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var newLike = _likeRepository.FindByCondition(l => l.PostID == request.PostID && l.UserID == UserID && l.LikeStatus == 1).FirstOrDefault();
+                var newLike = _likeRepository.FindByCondition(l => l.PostID == request.PostID && l.UserID == UserID).FirstOrDefault();
                 if(newLike == null)
                 {
                     var nlike = _mapper.Map<Like>(request);
@@ -35,8 +35,21 @@ namespace Reddit_App.Services
                     _likeRepository.Create(nlike);
                     _likeRepository.SaveChange();
                     return new MessageData { Data = nlike, Des = "Like success" };
-                }         
-                return new MessageData { Data = null, Des = "Like already exists"};
+                }    
+                else
+                {
+                    if(newLike.LikeStatus == 0)
+                    {
+                        newLike.LikeStatus = 1;
+                    }    
+                    else if(newLike.LikeStatus == 1)
+                    {
+                        newLike.LikeStatus = 0;
+                    }
+                    _likeRepository.UpdateByEntity(newLike);
+                    _likeRepository.SaveChange();
+                    return new MessageData { Data = newLike, Des = "Change like status success" };
+                }
             }
             catch(Exception ex)
             {
@@ -45,34 +58,34 @@ namespace Reddit_App.Services
 
         }
 
-        public MessageData DisLike(LikeRequest request, int UserID)
-        {
-            try
-            {
-                var res = _likeRepository.FindAll().Where(p => p.PostID == request.PostID && p.UserID == UserID && p.LikeStatus == 1).FirstOrDefault();
-                if(res == null)
-                {
-                    return new MessageData { Data = null, Des ="Unlike error" }; 
-                }    
-                else
-                {
-                    res.LikeStatus = 0;
-                    _likeRepository.UpdateByEntity(res);
-                    _likeRepository.SaveChange();
-                    return new MessageData { Data = res, Des = "Unlike success" };
-                }    
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-        }
+        //public MessageData DisLike(LikeRequest request, int UserID)
+        //{
+        //    try
+        //    {
+        //        var res = _likeRepository.FindAll().Where(p => p.PostID == request.PostID && p.UserID == UserID && p.LikeStatus == 1).FirstOrDefault();
+        //        if(res == null)
+        //        {
+        //            return new MessageData { Data = null, Des ="Unlike error" }; 
+        //        }    
+        //        else
+        //        {
+        //            res.LikeStatus = 0;
+        //            _likeRepository.UpdateByEntity(res);
+        //            _likeRepository.SaveChange();
+        //            return new MessageData { Data = res, Des = "Unlike success" };
+        //        }    
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
 
-        public MessageData getListLike(LikeRequest request)
+        public MessageData getListLike(int request)
         {
             try
             {
-                var res = _likeRepository.FindAll().Where(l => l.PostID == request.PostID && l.LikeStatus == 1);
+                var res = _likeRepository.FindAll().Where(l => l.PostID == request && l.LikeStatus == 1);
                 return new MessageData { Data = res, Des = "get list like success" };
             }
             catch(Exception ex)
@@ -81,11 +94,11 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData getNumberLikePost(LikeRequest request)
+        public MessageData getNumberLikePost(int request)
         {
             try
             {
-                var res = _likeRepository.FindByCondition(l => l.PostID == request.PostID && l.LikeStatus == 1).GroupBy(l => l.PostID).Select(l => new
+                var res = _likeRepository.FindByCondition(l => l.PostID == request && l.LikeStatus == 1).GroupBy(l => l.PostID).Select(l => new
                 {
                     PostID = l.Key,
                     LikeNumber = l.Count()

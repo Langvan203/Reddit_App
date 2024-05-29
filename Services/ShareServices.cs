@@ -30,7 +30,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var newShare = _shareRepository.FindByCondition(s => s.PostID == request.PostID && s.ShareStatus == 1 && s.UserID == UserLogined).FirstOrDefault();
+                var newShare = _shareRepository.FindByCondition(s => s.PostID == request.PostID && s.UserID == UserLogined).FirstOrDefault();
                 if (newShare == null)
                 {
                     var nShare = _mapper.Map<Share>(request);
@@ -40,7 +40,21 @@ namespace Reddit_App.Services
                     _shareRepository.SaveChange();
                     return new MessageData { Data = nShare, Des = "Add new share success" };
                 }
-                return new MessageData { Data = null, Des = "Share is already exsist" };
+                else
+                {
+                    if (newShare.ShareStatus == 1)
+                    {
+                        newShare.ShareStatus = 0;
+                    }
+                    else
+                    {
+                        newShare.ShareStatus = 1;
+                    }
+                    _shareRepository.UpdateByEntity(newShare);
+                    _shareRepository.SaveChange();
+                    return new MessageData { Data = null, Des = "Share is already exsist" };
+                }    
+                
             }
             catch (Exception ex)
             {
@@ -54,29 +68,6 @@ namespace Reddit_App.Services
             {
                 var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID);
                 return new MessageData { Data = lShare, Des = "Get list user share success" };
-            }
-            catch(Exception ex)
-            {
-                return new MessageData { Data = null, Des = ex.Message };
-            }
-        }
-
-        public MessageData UnShare(int UserLogined, ShareRequest request)
-        {
-            try
-            {
-                var UShare = _shareRepository.FindByCondition(s => s.UserID == UserLogined && s.PostID == request.PostID && s.ShareStatus == 1).FirstOrDefault();
-                if(UShare != null)
-                {
-                    UShare.ShareStatus = 0;
-                    _shareRepository.UpdateByEntity(UShare);
-                    _shareRepository.SaveChange();
-                    return new MessageData { Data = UShare, Des = "Un share success" };
-                }
-                else
-                {
-                    return new MessageData { Data = null, Des = "error when un share" };
-                }
             }
             catch(Exception ex)
             {

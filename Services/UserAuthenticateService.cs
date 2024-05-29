@@ -97,6 +97,7 @@ namespace Reddit_App.Services
 
                 var newUser = _mapper.Map<users>(request);
                 newUser.Role = "User";
+                newUser.PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord);
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();
                 return new MessageData { Data = newUser, Des = "Register successfull" };

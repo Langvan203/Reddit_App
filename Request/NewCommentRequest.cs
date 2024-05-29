@@ -6,6 +6,6 @@
 
         public string Content { get; set; }
 
-        public IFormFile ImageURL { get; set; }
+        public IFormFile? ImageURL { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Reddit_App.Dto;
 using Reddit_App.Models;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
+using System.Net.WebSockets;
 
 namespace Reddit_App.Services
 {
@@ -14,9 +15,11 @@ namespace Reddit_App.Services
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webHost;
         private readonly FollowRepository _followRespository;
+        private readonly usersRepository _userRepository;
         public FollowServices(ApiOptions apiOptions, IMapper mapper, DatabaseContext dbContext, IWebHostEnvironment webHost)
         {
             _followRespository = new FollowRepository(apiOptions, dbContext, mapper);
+            _userRepository = new usersRepository(apiOptions, dbContext, mapper);
             _apiOption = apiOptions;
             _mapper = mapper;
             _webHost = webHost;
@@ -44,12 +47,42 @@ namespace Reddit_App.Services
                 return new MessageData { Data = null, Des = "Error" };
             }
         }
-        public MessageData GetAllFollow(int UserID_er)
+        public object GetAllFollow(int UserLoginedID)
         {
             try
             {
-                var res = _followRespository.FindAll().Where(f => f.FollowerID == UserID_er && f.Status == 1);
-                return new MessageData { Data = res, Des = "Get list follow succes" };
+                // this code bellow is n+1 query problem?
+                // was fix N+1 Query problem
+                var res = _followRespository.FindAll().Where(f => f.FollowerID == UserLoginedID && f.Status == 1).ToList();
+                var followedIDs = res.Select(r => r.FollowedID).ToList();
+                var users = _userRepository.FindByCondition(p => followedIDs.Contains(p.UserID)).ToList();
+                List<ListFollowDto> listFollow = new List<ListFollowDto>();
+                foreach(var item in res)
+                {
+                    var followDto = new ListFollowDto();
+                    followDto.UserID = item.FollowedID;
+                    var checkUsername = users.FirstOrDefault(p => p.UserID == item.FollowedID);
+                    if(checkUsername != null)
+                    {
+                        followDto.UserName = checkUsername.UserName;
+                        followDto.Avata = checkUsername.Image;
+                    }
+                    else
+                    {
+                        followDto.UserName = "";
+                        followDto.Avata = "";
+                    }
+                     
+                    listFollow.Add(followDto);
+                }
+                listFollow.Reverse();
+                var ListFollowUser = new
+                {
+                    Following = listFollow,
+                    NumberFollow = listFollow.Count()
+                };
+                    
+                return ListFollowUser;
             }
             catch
             {

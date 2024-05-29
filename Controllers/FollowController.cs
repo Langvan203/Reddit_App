@@ -30,7 +30,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _followServices.GetAllFollow(UserIDLogined);
-                return new MessageData { Data = res.Data, Des = "get all follow success"};
+                return new MessageData { Data = res, Des = "get all follow success"};
             }
             catch(Exception ex)
             {

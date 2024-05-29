@@ -55,7 +55,7 @@ namespace Reddit_App.Controllers
 
         [HttpPost]
         [Route("AddNewComment")]
-        public MessageData AddNewComment(NewCommentRequest request)
+        public MessageData AddNewComment([FromForm] NewCommentRequest request)
         {
             try
             {

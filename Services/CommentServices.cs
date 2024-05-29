@@ -29,6 +29,17 @@ namespace Reddit_App.Services
             try
             {
                 var newComment = _mapper.Map<Comment>(request);
+                newComment.Image = "";
+                if (request.ImageURL != null)
+                {
+                    var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
+                    using(FileStream fileStream = File.Create(_webHost.WebRootPath + "\\comment\\images\\" + date + request.ImageURL.FileName))
+                    {
+                        request.ImageURL.CopyTo(fileStream);
+                        fileStream.Flush();
+                    }
+                    newComment.Image = "comment/images/" + date + request.ImageURL.FileName;
+                }
                 newComment.CommentStatus = 1;
                 newComment.UserID = UserLogined;
                 _commentRepository.Create(newComment);
