@@ -112,7 +112,6 @@ builder.Services.AddSingleton<WebSocketHandle>(provider =>
 });
 
 
-builder.Services.AddSingleton<SendNotificationRepository, SendNotificationServices>();
 
 var app = builder.Build();
 

@@ -22,7 +22,7 @@ namespace Reddit_App.Services
             _apiOptions = apiOptions;
         }
 
-        public MessageData AddNewTag(TagRequest request)
+        public object AddNewTag(TagRequest request)
         {
             try
             {
@@ -32,34 +32,34 @@ namespace Reddit_App.Services
                     var newTag = _mapper.Map<Tags>(request);
                     _tagRepos.Create(newTag);
                     _tagRepos.SaveChange();
-                    return new MessageData { Data = newTag, Des = "Add new tag succesfully" };
+                    return newTag;
                 }    
                 else
                 {
-                    return new MessageData { Data = null, Des = $"{request.TagName} has been already in Tags" };
+                    return null;
                 }    
             }
-            catch
+            catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Error" };
+                throw ex;
             }
         }
 
 
-        public MessageData GetListTag()
+        public object GetListTag()
         {
             try
             {
                 var res = _tagRepos.FindAll();
-                return new MessageData { Data = res, Des = "Get list tag success" };
+                return res;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Error get tag" };
+                throw ex;
             }
         }
 
-        public MessageData RemoveTag(int TagID)
+        public object RemoveTag(int TagID)
         {
             try
             {
@@ -68,13 +68,13 @@ namespace Reddit_App.Services
                 {
                     _tagRepos.DeleteByEntity(res);
                     _tagRepos.SaveChange();
-                    return new MessageData { Data = res, Des = "Remove tag successfull" };
+                    return res;
                 }
-                return new MessageData { Data = null, Des = "Remove error" };
+                return null;
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.ToString() };
+                throw ex;
             }
 
         }

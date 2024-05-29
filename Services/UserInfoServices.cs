@@ -23,14 +23,14 @@ namespace Reddit_App.Services
             _webHost = webhost;
         }
 
-        public MessageData UpdateInfo(UpdateUserInfoRequest request, int UserLoginID)
+        public object UpdateInfo(UpdateUserInfoRequest request, int UserLoginID)
         {
             try
             {
                 var res = _usersRepository.FindByCondition(p => p.UserID == UserLoginID).FirstOrDefault();
                 if (res == null)
                 {
-                    return new MessageData { Data = null, Des = "Can't not get user info" };
+                    return null;
                 }
                 else
                 {
@@ -54,29 +54,42 @@ namespace Reddit_App.Services
                         res.DateOfBirth = request.DateOfBirth;
                         _usersRepository.UpdateByEntity(res);
                         _usersRepository.SaveChange();
-                        return new MessageData { Data = res, Des = "Update user succes" };
+                        return res;
                     }    
                     else
                     {
-                        return new MessageData { Data = null, Des = "Email or username has been used" };
+                        return null;
                     }    
                     
                 }
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.Message };
+                throw ex;
             }
         }
 
-        public MessageData GetInfo(int UserLoginID)
+        public object GetUserLoginedInfo(int UserLoginID)
         {
             try
             {
                 var res = _usersRepository.FindByCondition(u => u.UserID == UserLoginID).FirstOrDefault();
-                return new MessageData { Data = res, Des = "Get user profile success" };
+                return res;
             }
             catch(Exception ex)
+            {
+                return new MessageData { Data = null, Des = "Can't not find user" };
+            }
+        }
+        
+        public object GetUerInfor(int UserID)
+        {
+            try
+            {
+                var res = _usersRepository.FindByCondition(u => u.UserID == UserID).FirstOrDefault();
+                return res;
+            }
+            catch (Exception ex)
             {
                 return new MessageData { Data = null, Des = "Can't not find user" };
             }

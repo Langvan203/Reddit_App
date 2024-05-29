@@ -28,21 +28,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _likeServices.getListLike(postID);
-                return new MessageData { Data = res.Data, Des = res.Des };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        }
-        [HttpGet]
-        [Route("GetNumberLike")]
-        public MessageData GetNumberLike(int postID)
-        {
-            try
-            {
-                var res = _likeServices.getNumberLikePost(postID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get list like succes" };
             }
             catch (Exception ex)
             {
@@ -57,7 +43,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _likeServices.AddNewLike(request, UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Add new like success" };
             }
             catch (Exception e)
             {

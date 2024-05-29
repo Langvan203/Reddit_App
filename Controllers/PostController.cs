@@ -36,7 +36,7 @@ namespace Reddit_App.Controllers
                 //await _hubContext.Clients.All.SendAsync("ReceiveNotification", "A new post has been added.");
                 //_hubContext.Clients.All.SendAsync("ReceiveNotification", "Có bài viết mới được tạo.");
                 //var response = await _httpClient.PostAsync("https://localhost:7036/api/Notification/CreateNewNoti", null);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Add new post success" };
             }
             catch(Exception ex)
             {
@@ -51,7 +51,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.GetAllPost();
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get list post success" };
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.GetPostByTag(tagID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "get post by tag succes" };
             }
             catch (Exception ex)
             {
@@ -80,7 +80,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.GetPostByUser(UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get post by user success" };
             }
             catch(Exception ex)
             {
@@ -89,13 +89,12 @@ namespace Reddit_App.Controllers
         }
         [HttpPut]
         [Route("UpdatePost")]
-        [Authorize(Roles ="Admin")]
         public MessageData UpdatePost([FromForm] UpdatePostRequest request)
         {
             try
             {
                 var res = _postServices.UpdatePost(request, UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Update post success" };
             }
             catch(Exception ex)
             {
@@ -109,7 +108,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.DeletePostByID(postID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Delete post success" };
             }
             catch(Exception ex)
             {
@@ -118,12 +117,12 @@ namespace Reddit_App.Controllers
         }
         [HttpGet]
         [Route("GetPostContent")]
-        public MessageData GetPostByContent(string content)
+        public MessageData GetPostByContentAndTitle(string content, string title)
         {
             try
             {
-                var res = _postServices.GetPostByContent(content);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                var res = _postServices.GetPostByContent(content, title);
+                return new MessageData { Data = res, Des = "Get post by content succes" };
             }
             catch(Exception ex)
             {

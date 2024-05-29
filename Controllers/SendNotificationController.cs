@@ -8,11 +8,11 @@ namespace Reddit_App.Controllers
     [ApiController]
     public class SendNotificationController : ControllerBase
     {
-        private readonly SendNotificationServices _sendNotiServices;
         
-        public SendNotificationController(SendNotificationServices sendNotiServices)
+        
+        public SendNotificationController()
         {
-            _sendNotiServices = sendNotiServices;
+            
         }
 
         [HttpPost]
@@ -22,7 +22,7 @@ namespace Reddit_App.Controllers
             var postID = data.PostID;
             var usernames = data.Username.ToObject<List<string>>();
 
-            await _sendNotiServices.SendNotificationAsync(userID, postID, usernames);
+           
 
             return Ok();
         }

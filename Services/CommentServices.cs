@@ -12,6 +12,7 @@ namespace Reddit_App.Services
     public class CommentServices
     {
         private readonly CommentRepository _commentRepository;
+        private readonly usersRepository _userRepository;
         private readonly ApiOptions _apiOptions;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webHost;
@@ -19,12 +20,13 @@ namespace Reddit_App.Services
         public CommentServices(ApiOptions apiOptions, DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webHost)
         {
             _commentRepository = new CommentRepository(apiOptions, dbContext, mapper);
+            _userRepository = new usersRepository(apiOptions, dbContext, mapper);
             _apiOptions = apiOptions;
             _mapper = mapper;
             _webHost = webHost;
         }
 
-        public MessageData AddNewComment(int UserLogined, NewCommentRequest request)
+        public object AddNewComment(int UserLogined, NewCommentRequest request)
         {
             try
             {
@@ -44,49 +46,50 @@ namespace Reddit_App.Services
                 newComment.UserID = UserLogined;
                 _commentRepository.Create(newComment);
                 _commentRepository.SaveChange();
-                return new MessageData { Data = newComment, Des = "Add new comment success" };
+                return newComment;
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.Message };
+                throw ex;
             }
         }
 
-        public MessageData GetListComment(int PostID)
+        public object GetListComment(int PostID)
         {
             try
             {
-                var listComment = _commentRepository.FindByCondition(m => m.PostID == PostID && m.CommentStatus == 1).Select(l => new
+                var listComment = _commentRepository.FindByCondition(m => m.PostID == PostID && m.CommentStatus == 1).ToList();
+                var res = listComment.Select(p => p.UserID).ToList();
+                var users = _userRepository.FindByCondition(p => res.Contains(p.UserID)).ToList();
+                List<ListCommentDto> listUserComment= new List<ListCommentDto>();
+                foreach(var item in listComment)
                 {
-                    UserID = l.UserID,
-                    Content = l.Content
-                });
-                return new MessageData { Data = listComment, Des = "Get list comment success" };
+                    var userComment = new ListCommentDto();
+                    userComment.Content = item.Content;
+                    userComment.CommentImage = item.Image;
+                    var checkUserInfor = users.FirstOrDefault(p => p.UserID == item.UserID);
+                    if (checkUserInfor != null)
+                    {
+                        userComment.UserID = checkUserInfor.UserID;
+                        userComment.UserName = checkUserInfor.UserName;
+                        userComment.Avata = checkUserInfor.Image;
+                    }
+                    listUserComment.Add(userComment);
+                }
+                listUserComment.Reverse();
+                return new
+                {
+                    ListComment = listUserComment,
+                    NumberComment = listUserComment.Count()
+                };
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = "Error when get list comment" };
+                throw ex;
             }
         }
 
-        public MessageData GetTotalComment(int PostID)
-        {
-            try
-            {
-                var totalComment = _commentRepository.FindByCondition(m => m.PostID == PostID && m.CommentStatus == 1).GroupBy(m => m.PostID).Select(l => new
-                {
-                    PostID = l.Key,
-                    TotalComment = l.Count()
-                });
-                return new MessageData { Data = totalComment, Des = "Get total comment success" };
-            }
-            catch (Exception ex)
-            {
-                return new MessageData { Data = null, Des = ex.Message };
-            }
-        }
-
-        public MessageData UpdateComment(int UserLogined, NewCommentRequest request)
+        public object UpdateComment(int UserLogined, NewCommentRequest request)
         {
             try
             {
@@ -96,20 +99,20 @@ namespace Reddit_App.Services
                     uComment.Content = request.Content;
                     _commentRepository.UpdateByEntity(uComment);
                     _commentRepository.SaveChange();
-                    return new MessageData { Data = uComment, Des = "Update comment success" };
+                    return uComment;
                 }
                 else
                 {
-                    return new MessageData { Data = null, Des = "Can't find comment" };
+                    return null;
                 }
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Error when update comment" };
+                throw ex;
             }
         }
         
-        public MessageData DeleteComment(int UserLogined, NewCommentRequest request)
+        public object DeleteComment(int UserLogined, NewCommentRequest request)
         {
             try
             {
@@ -120,13 +123,13 @@ namespace Reddit_App.Services
                     dComment.CommentStatus = 0;
                     _commentRepository.UpdateByEntity(dComment);
                     _commentRepository.SaveChange();
-                    return new MessageData { Data = dComment, Des = "Delete comment succes" };
+                    return dComment;
                 }
-                return new MessageData { Data = null, Des = "Can't find comment" };
+                return null;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.Message};
+                throw ex;
             }
         }
 

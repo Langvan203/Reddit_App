@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reddit_App.Common;
@@ -22,13 +23,14 @@ namespace Reddit_App.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("AddNewTag")]
         public MessageData AddNewTag(TagRequest request)
         {
             try
             {
                 var res = _tagServices.AddNewTag(request);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Add new tag success" };
             }
             catch(Exception ex)
             {
@@ -43,7 +45,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _tagServices.GetListTag();
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get list tag success" };
             }
             catch(Exception ex)
             {
@@ -58,7 +60,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _tagServices.RemoveTag(TagID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Remove tag sucesss" };
             }
             catch(Exception ex)
             {

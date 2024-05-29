@@ -72,14 +72,14 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData UserRegister(UserRegisterRequest request)
+        public object UserRegister(UserRegisterRequest request)
         {
             try
             {
                 var findUser = _userRepository.FindByCondition(r => r.UserName == request.UserName).FirstOrDefault();
                 if(findUser != null)
                 {
-                    return new MessageData { Data = null, Des = "User name has been used" };
+                    return null;
                 }
 
 
@@ -100,11 +100,11 @@ namespace Reddit_App.Services
                 newUser.PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord);
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();
-                return new MessageData { Data = newUser, Des = "Register successfull" };
+                return newUser;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.ToString()};
+                throw ex;
             }
         }
     }

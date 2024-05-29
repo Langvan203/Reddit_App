@@ -26,7 +26,7 @@ namespace Reddit_App.Services
             _webhost = webhost;
         }
 
-        public MessageData AddNewShare(int UserLogined,ShareRequest request)
+        public object AddNewShare(int UserLogined,ShareRequest request)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Reddit_App.Services
                     nShare.ShareStatus = 1;
                     _shareRepository.Create(nShare);
                     _shareRepository.SaveChange();
-                    return new MessageData { Data = nShare, Des = "Add new share success" };
+                    return nShare;
                 }
                 else
                 {
@@ -52,22 +52,38 @@ namespace Reddit_App.Services
                     }
                     _shareRepository.UpdateByEntity(newShare);
                     _shareRepository.SaveChange();
-                    return new MessageData { Data = null, Des = "Share is already exsist" };
+                    return null;
                 }    
                 
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = ex.Message };
+                throw ex;
             }
         }
 
-        public MessageData GetListShare(int PostID)
+        public object GetListShare(int PostID)
         {
             try
             {
-                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID);
-                return new MessageData { Data = lShare, Des = "Get list user share success" };
+                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID).ToList();
+                var lUser = lShare.Select(s => s.UserID).ToList();
+                var users = _userRepository.FindByCondition(u => lUser.Contains(u.UserID)).ToList();
+                List<GetListShareDto> listShare = new List<GetListShareDto>();
+                foreach(var item in lShare)
+                {
+                    var shareU = new GetListShareDto();
+                    var checkUser = users.FirstOrDefault(u => u.UserID == item.UserID);
+                    if(checkUser != null)
+                    {
+                        shareU.UserName = checkUser.UserName;
+                        shareU.UserID = checkUser.UserID;
+                        shareU.Image = checkUser.Image;
+                    }
+                    listShare.Add(shareU);
+                }
+                listShare.Reverse();
+                return listShare;
             }
             catch(Exception ex)
             {
@@ -75,7 +91,7 @@ namespace Reddit_App.Services
             }
         }
 
-        public MessageData GetNumberShare(int PostID)
+        public object GetNumberShare(int PostID)
         {
             try
             {
@@ -84,11 +100,11 @@ namespace Reddit_App.Services
                     PostID = l.Key,
                     NumberShare = l.Count()
                 });
-                return new MessageData { Data = nShare, Des = "Get total number share success" };
+                return nShare;
             }
             catch(Exception ex) {
 
-                return new MessageData { Data = null, Des = ex.Message };
+                throw ex;
             }
         }
     }

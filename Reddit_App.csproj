@@ -29,6 +29,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\avata\images\" />
+    <Folder Include="wwwroot\comment\images\" />
     <Folder Include="wwwroot\posts\images\" />
   </ItemGroup>
 

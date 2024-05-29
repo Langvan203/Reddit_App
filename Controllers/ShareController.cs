@@ -29,7 +29,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _shareServices.GetListShare(PostID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get list share succes" };
             }
             catch(Exception ex)
             {
@@ -44,7 +44,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _shareServices.AddNewShare(UserIDLogined, request);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "add new share success" };
             }
             catch(Exception ex)
             {
@@ -59,7 +59,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _shareServices.GetNumberShare(PostID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get total share success" };
             }
             catch (Exception ex)
             {

@@ -30,7 +30,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _commentservices.GetListComment(PostID);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Get list comment succes" };
             }
             catch (Exception ex)
             {
@@ -38,20 +38,6 @@ namespace Reddit_App.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("GetTotalComment")]
-        public MessageData GetToTalComment(int PostID)
-        {
-            try
-            {
-                var res = _commentservices.GetTotalComment(PostID);
-                return new MessageData { Data = res.Data, Des = res.Des };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        }
 
         [HttpPost]
         [Route("AddNewComment")]
@@ -60,7 +46,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _commentservices.AddNewComment(UserIDLogined, request);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "add new comment succes" };
             }
             catch (Exception ex)
             {
@@ -70,12 +56,12 @@ namespace Reddit_App.Controllers
 
         [HttpPut]
         [Route("UpdateComment")]
-        public MessageData UpdateComment(NewCommentRequest request)
+        public MessageData UpdateComment([FromForm] NewCommentRequest request)
         {
             try
             {
                 var res = _commentservices.UpdateComment(UserIDLogined, request);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Update comment success" };
 
             }
             catch(Exception ex)
@@ -92,7 +78,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _commentservices.DeleteComment(UserIDLogined, request);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "Delete comment succes" };
             }
             catch(Exception ex)
             {

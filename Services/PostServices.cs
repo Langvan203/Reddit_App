@@ -13,6 +13,9 @@ namespace Reddit_App.Services
     public class PostServices
     {
         private readonly PostRespository _postRespository;
+        private readonly usersRepository _userRepository;
+        private readonly TagRespository _tagRepository;
+        private readonly CommentRepository _commentRepository;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webhost;
         private readonly ApiOptions _apiOptions;
@@ -20,12 +23,15 @@ namespace Reddit_App.Services
         public PostServices(ApiOptions apiOptions,DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webhost)
         {
             _postRespository = new PostRespository(apiOptions,dbContext, mapper);
+            _userRepository = new usersRepository(apiOptions, dbContext, mapper);
+            _tagRepository = new TagRespository(apiOptions, dbContext, mapper);
+            _commentRepository = new CommentRepository(apiOptions, dbContext, mapper);
             _apiOptions = apiOptions;
             _mapper = mapper; 
             _webhost = webhost;
         }
 
-        public MessageData AddNewPost(CreateNewPost request, int userID)
+        public object AddNewPost(CreateNewPost request, int userID)
         {
             try
             {
@@ -44,19 +50,48 @@ namespace Reddit_App.Services
                 p.UserID = userID;
                 _postRespository.Create(p);
                 _postRespository.SaveChange();
-                return new MessageData { Data = p, Des = "Add new post succesfully" };
+                return p;
             }
-            catch
+            catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Fail to add new post" };
+                throw ex;
             }
         }
-        public MessageData GetAllPost()
+        public object GetAllPost()
         {
             try
             {
-                var res = _postRespository.FindAll();
-                return new MessageData { Data = res, Des = "Get all post" };
+                var res = _postRespository.FindAll().ToList();
+                var listUser = res.Select(p => p.UserID).ToList();
+                var listTag = res.Select(p => p.TagID).ToList();
+                var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
+                var tagPost = _tagRepository.FindByCondition(t => listTag.Contains(t.TagID)).ToList();
+                var listComment = res.Select(p => p.PostID).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+                List<GetPostDto> listPost = new List<GetPostDto>();
+                foreach(var item in res)
+                {
+                    var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
+                    var dsPost = new GetPostDto();
+                    dsPost.PostID = item.PostID;
+                    var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
+                    if(checkUser != null)
+                    {
+                        dsPost.UserID = checkUser.UserID;
+                        dsPost.UserName = checkUser.UserName;
+                        dsPost.Avata = checkUser.Image;
+                    }
+                    var checkTag = tagPost.FirstOrDefault(t => t.TagID == item.TagID);
+                    if(checkTag != null)
+                    {
+                        dsPost.TagName = checkTag.TagName;
+                    }
+                    dsPost.TotalComment = totalComment;
+                    listPost.Add(dsPost);
+                }
+                listPost.Reverse();
+                return listPost;
             }
             catch
             {
@@ -64,20 +99,20 @@ namespace Reddit_App.Services
             }
         }
         
-        public MessageData GetPostByUser(int userID)
+        public object GetPostByUser(int userID)
         {
             try
             {
                 var res = _postRespository.FindAll().Where(c => c.UserID == userID);
-                return new MessageData { Data = res, Des = "Get success" };
+                return res;
             }
-            catch
+            catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Get failed" };
+                throw ex;
             }
         }
 
-        public MessageData UpdatePost(UpdatePostRequest request,int userID)
+        public object UpdatePost(UpdatePostRequest request,int userID)
         {
             try
             {
@@ -103,55 +138,55 @@ namespace Reddit_App.Services
                 postUpdate.UserID = userID;
                 _postRespository.UpdateByEntity(postUpdate);
                 _postRespository.SaveChange();
-                return new MessageData { Data = postUpdate, Des = "Update successfully" };
+                return postUpdate;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "update failed" };
+                throw ex;
             }
         }
 
-        public MessageData GetPostByTag(int tagID)
+        public object GetPostByTag(int tagID)
         {
             try
             {
                 var res = _postRespository.FindAll().Where(p => p.TagID == tagID);
-                return new MessageData { Data = res, Des = $"Find all post with tagID = {tagID} successfully" };
+                return res;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Find faild" };
+                throw ex;
             }
         }
 
         // khi tìm kiếm bằng UTF-8 và khi không có thì lỗi tìm 
-        public MessageData GetPostByContent(string content)
+        public object GetPostByContent(string content, string title)
         {
             try
             {
-                var res = _postRespository.FindByCondition(p => p.Content.Contains(content));
-                return new MessageData { Data = res, Des = "Get post by conten success" };
+                var res = _postRespository.FindByCondition(p => p.Content.Contains(content) || p.Title.Contains(title));
+                return res;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Get post fail" };
+                throw ex;
             }
         }
 
-        public MessageData DeletePostByID(int PostID)
+        public object DeletePostByID(int PostID)
         {
             try
             {
                 var res = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
                 if(res == null)
                 {
-                    return new MessageData { Data = null, Des = "Can't not find post" };
+                    return null;
                 }    
                 else
                 {
                     _postRespository.DeleteByEntity(res);
                     _postRespository.SaveChange();
-                    return new MessageData { Data = res, Des = "Delete post successful" };
+                    return res;
                 }    
             }
             catch(Exception ex)

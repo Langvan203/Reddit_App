@@ -23,13 +23,28 @@ namespace Reddit_App.Controllers
         }
 
         [HttpGet]
-        [Route("GetUserInfor")]
-        public MessageData GetUserInfor()
+        [Route("GetUserLoginedInfor")]
+        public MessageData GetUserLoginedInfor()
         {
             try
             {
-                var res = _userinfo.GetInfo(UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                var res = _userinfo.GetUserLoginedInfo(UserIDLogined);
+                return new MessageData { Data = res, Des = "Get user logined infor success" };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetUserInfor")]
+        public MessageData GetUserInfor(int UserID)
+        {
+            try
+            {
+                var res = _userinfo.GetUerInfor(UserID);
+                return new MessageData { Data = res, Des = "Get user logined infor success" };
             }
             catch(Exception ex)
             {
@@ -44,7 +59,7 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _userinfo.UpdateInfo(request, UserIDLogined);
-                return new MessageData { Data = res.Data, Des = res.Des };
+                return new MessageData { Data = res, Des = "update user info succes" };
             }
             catch(Exception ex)
             {
