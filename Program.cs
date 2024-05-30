@@ -13,6 +13,7 @@ using Reddit_App.Helpers;
 using Microsoft.AspNetCore.WebSockets;
 using Reddit_App.Helpers.SocketHelper;
 using Reddit_App.Services;
+using Reddit_App.Helpers.SendnotificationHub;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +24,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSignalR();
 // add authenciate
 builder.Services.AddSwaggerGen(c =>
 {
@@ -132,21 +133,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// add websocket
-
-//var webSocketOptions = new WebSocketOptions()
-//{
-//    KeepAliveInterval = TimeSpan.FromSeconds(10),
-//    ReceiveBufferSize = 4 * 1024
-//};
-
-//app.UseWebSockets(webSocketOptions);
-//var sendNoti = app.Services.GetService<SendNotiHandler>();
-//app.UseMiddleware<WebSocketMiddlewareCustom>(sendNoti);
 
 
-
-// swaggerUI
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -157,7 +145,11 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-//app.MapHub<DetectNewEvent>("/notificationHub");
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllers();
+//    endpoints.MapHub<NotificationHub>("/notificationHub");
+//});
 
 app.UseHttpsRedirection();
 

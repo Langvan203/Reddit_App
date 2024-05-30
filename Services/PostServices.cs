@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using Reddit_App.Models;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
+
 namespace Reddit_App.Services
 {
     public class PostServices
@@ -31,7 +32,7 @@ namespace Reddit_App.Services
             _webhost = webhost;
         }
 
-        public object AddNewPost(CreateNewPost request, int userID)
+        public async Task<object> AddNewPost(CreateNewPost request, int userID)
         {
             try
             {
@@ -50,6 +51,7 @@ namespace Reddit_App.Services
                 p.UserID = userID;
                 _postRespository.Create(p);
                 _postRespository.SaveChange();
+
                 return p;
             }
             catch(Exception ex)
@@ -75,6 +77,9 @@ namespace Reddit_App.Services
                     var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
                     var dsPost = new GetPostDto();
                     dsPost.PostID = item.PostID;
+                    dsPost.Content = item.Content;
+                    dsPost.Title = item.Title;
+                    dsPost.Image = item.Image;
                     var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
                     if(checkUser != null)
                     {
