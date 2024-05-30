@@ -44,14 +44,14 @@ namespace Reddit_App.Services
                     new Claim(ClaimTypes.UserData, user.UserName),
                     new Claim(ClaimTypes.Sid, user.UserID.ToString()),
                 };
-                //if (user.UserName == "admin" && user.PassWord == "admin")
-                //{
-                //    var newClaimList = claimList.ToList();
-                //    //newClaimList.RemoveAll(claim => claim.Type == ClaimTypes.Role && claim.Value == "User");
-                //    newClaimList.Add(new Claim(ClaimTypes.Role, "Admin"));
-                //    // renew claim
-                //    claimList = newClaimList.ToArray();
-                //}
+                if (user.UserName == "admin")
+                {
+                    var newClaimList = claimList.ToList();
+                    newClaimList.RemoveAll(claim => claim.Type == ClaimTypes.Role && claim.Value == "User");
+                    newClaimList.Add(new Claim(ClaimTypes.Role, "Admin"));
+                    // renew claim
+                    claimList = newClaimList.ToArray();
+                }
                 var token = new JwtSecurityToken(
                     issuer: _apiOption.ValidIssuer,
                     audience: _apiOption.ValidAudience,

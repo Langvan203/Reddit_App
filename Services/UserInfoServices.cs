@@ -2,6 +2,7 @@
 using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
+using Reddit_App.Models;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
 using System.IO;
@@ -34,32 +35,31 @@ namespace Reddit_App.Services
                 }
                 else
                 {
-                    var checkUserName = _usersRepository.FindByCondition(u => u.UserName == request.UserName).FirstOrDefault();
-                    var checkEmail = _usersRepository.FindByCondition(u => u.Email == request.Email).FirstOrDefault();
-
-                    if(checkUserName != null && checkEmail != null)
+                    
+                    
+                    if(request.Avata != null && request.Avata.FileName != res.Image)
                     {
-                        if(request.Avata != null && request.Avata.FileName != res.Image)
+                        var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
+                        using (FileStream fileStream = File.Create(_webHost.WebRootPath + "\\avata\\images" + date + request.Avata.FileName))
                         {
-                            var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
-                            using (FileStream fileStream = File.Create(_webHost.WebRootPath + "\\avata\\images" + date + request.Avata.FileName))
-                            {
-                                request.Avata.CopyTo(fileStream);
-                                fileStream.Flush();
-                            }
-                            res.Image = "/avata/images" + date + request.Avata.FileName;
-                        }    
-                        res.PassWord = request.PassWord;
-                        res.Email = request.Email;
-                        res.DateOfBirth = request.DateOfBirth;
-                        _usersRepository.UpdateByEntity(res);
-                        _usersRepository.SaveChange();
-                        return res;
+                            request.Avata.CopyTo(fileStream);
+                            fileStream.Flush();
+                        }
+                        res.Image = "/avata/images" + date + request.Avata.FileName;
+                    }    
+                    res.PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord);
+                    res.Email = request.Email;
+                    if(request.DateOfBirth == null)
+                    {
+                        res.DateOfBirth = DateTime.Now;
                     }    
                     else
                     {
-                        return null;
+                        res.DateOfBirth = request.DateOfBirth.Value;
                     }    
+                    _usersRepository.UpdateByEntity(res);
+                    _usersRepository.SaveChange();
+                    return res;
                     
                 }
             }

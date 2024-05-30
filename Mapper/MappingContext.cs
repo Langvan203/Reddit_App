@@ -18,6 +18,7 @@ namespace Reddit_App.Mapper
             CreateMap<ShareRequest, Share>();
             CreateMap<NewCommentRequest, Comment>();
             CreateMap<UserRegisterRequest, users>();
+            CreateMap<UpdateUserInfoRequest, users>();
         } 
     }
 }

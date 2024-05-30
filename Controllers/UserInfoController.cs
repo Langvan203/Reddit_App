@@ -54,7 +54,7 @@ namespace Reddit_App.Controllers
 
         [HttpPut]
         [Route("UpdateUser")]
-        public MessageData UpdateUserInfor(UpdateUserInfoRequest request)
+        public MessageData UpdateUserInfor([FromForm]UpdateUserInfoRequest request)
         {
             try
             {
