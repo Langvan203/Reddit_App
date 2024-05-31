@@ -62,6 +62,9 @@ builder.Services.AddCors(option =>
     option.AddDefaultPolicy(builder =>
     {
         builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+
+
+        //builder.WithOrigins("http://127.0.0.1:5500").AllowAnyMethod().AllowAnyHeader();
     });
 });
 
@@ -145,15 +148,15 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-//app.UseEndpoints(endpoints =>
-//{
-//    endpoints.MapControllers();
-//    endpoints.MapHub<NotificationHub>("/notificationHub");
-//});
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");
+});
 
 app.MapControllers();
 

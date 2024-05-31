@@ -19,6 +19,7 @@ namespace Reddit_App.Mapper
             CreateMap<NewCommentRequest, Comment>();
             CreateMap<UserRegisterRequest, users>();
             CreateMap<UpdateUserInfoRequest, users>();
+            CreateMap<TagRequest, Tags>();
         } 
     }
 }

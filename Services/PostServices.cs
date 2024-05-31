@@ -7,6 +7,8 @@ using Reddit_App.Request;
 using System.Net.WebSockets;
 using Reddit_App.Models;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.AspNetCore.SignalR;
+using Reddit_App.Helpers.SendnotificationHub;
 
 
 namespace Reddit_App.Services
@@ -20,16 +22,20 @@ namespace Reddit_App.Services
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webhost;
         private readonly ApiOptions _apiOptions;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly FollowRepository _followRepository;
 
-        public PostServices(ApiOptions apiOptions,DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webhost)
+        public PostServices(ApiOptions apiOptions,DatabaseContext dbContext, IMapper mapper, IWebHostEnvironment webhost, IHubContext<NotificationHub> hubContext)
         {
             _postRespository = new PostRespository(apiOptions,dbContext, mapper);
             _userRepository = new usersRepository(apiOptions, dbContext, mapper);
             _tagRepository = new TagRespository(apiOptions, dbContext, mapper);
             _commentRepository = new CommentRepository(apiOptions, dbContext, mapper);
+            _followRepository = new FollowRepository(apiOptions, dbContext, mapper);
             _apiOptions = apiOptions;
             _mapper = mapper; 
             _webhost = webhost;
+            _hubContext = hubContext;
         }
 
         public async Task<object> AddNewPost(CreateNewPost request, int userID)
@@ -51,7 +57,12 @@ namespace Reddit_App.Services
                 p.UserID = userID;
                 _postRespository.Create(p);
                 _postRespository.SaveChange();
-
+                var followers = _followRepository.FindByCondition(f => f.FollowedID == userID && f.Status == 1).ToList();
+                foreach(var item in followers)
+                {
+                    var message = $"User {userID} has create a new post";
+                    await _hubContext.Clients.User(item.FollowedID.ToString()).SendAsync("ReceiveNotification", message);
+                }    
                 return p;
             }
             catch(Exception ex)
@@ -59,6 +70,7 @@ namespace Reddit_App.Services
                 throw ex;
             }
         }
+
         public object GetAllPost()
         {
             try

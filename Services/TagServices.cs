@@ -26,7 +26,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _tagRepos.FindAll().Where(c => c.TagName == request.TagName).FirstOrDefault();
+                var res = _tagRepos.FindByCondition(t => t.TagName == request.TagName).FirstOrDefault();
                 if(res == null)
                 {
                     var newTag = _mapper.Map<Tags>(request);

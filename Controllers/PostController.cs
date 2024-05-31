@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
+using Reddit_App.Helpers.SendnotificationHub;
 using Reddit_App.Request;
 using Reddit_App.Services;
  
@@ -18,10 +19,10 @@ namespace Reddit_App.Controllers
         private readonly PostServices _postServices;
         private readonly IMapper _mapper;
         //private readonly HttpClient _httpClient;
-        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions)
+        public PostController(DatabaseContext dbcontext, IMapper mapper, IWebHostEnvironment webHost, ApiOptions apiOptions, IHubContext<NotificationHub> hubContext)
         {
             _mapper = mapper;
-            _postServices = new PostServices(apiOptions, dbcontext, mapper, webHost);
+            _postServices = new PostServices(apiOptions, dbcontext, mapper, webHost, hubContext);
             //_httpClient = httpClient;
         }
 
@@ -33,9 +34,6 @@ namespace Reddit_App.Controllers
             try
             {
                 var res = _postServices.AddNewPost(request, UserIDLogined);
-                //await _hubContext.Clients.All.SendAsync("ReceiveNotification", "A new post has been added.");
-                //_hubContext.Clients.All.SendAsync("ReceiveNotification", "Có bài viết mới được tạo.");
-                //var response = await _httpClient.PostAsync("https://localhost:7036/api/Notification/CreateNewNoti", null);
                 return new MessageData { Data = res, Des = "Add new post success" };
             }
             catch(Exception ex)

@@ -29,7 +29,6 @@ namespace Reddit_App.Services
         {
             try
             {
-                
                 var temp = _followRespository.FindByCondition(e => e.FollowerID == userID_er && e.FollowedID == request.FollowedID).FirstOrDefault();
                 if(temp == null)
                 {
@@ -50,7 +49,9 @@ namespace Reddit_App.Services
                     {
                         temp.Status = 0;
                     }
-                    return null;
+                    _followRespository.UpdateByEntity(temp);
+                    _followRespository.SaveChange();
+                    return temp;
                 }
                 
             }
