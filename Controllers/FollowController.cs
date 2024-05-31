@@ -39,6 +39,22 @@ namespace Reddit_App.Controllers
         }
 
 
+
+        [HttpGet]
+        [Route("ViewListUserFollow")]
+        public MessageData ViewListUserFollow(int UserID)
+        {
+            try
+            {
+                var res = _followServices.GetAllFollow(UserID);
+                return new MessageData { Data = res, Des = "get all follow success" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
         [HttpPost]
         [Route("AddNewFollow")]
 
