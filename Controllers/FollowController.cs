@@ -25,11 +25,11 @@ namespace Reddit_App.Controllers
 
         [HttpGet]
         [Route("GetListFollow")]
-        public MessageData GetAllFollow()
+        public MessageData GetAllFollow(int UserID)
         {
             try
             {
-                var res = _followServices.GetAllFollow(UserIDLogined);
+                var res = _followServices.GetAllFollow(UserID);
                 return new MessageData { Data = res, Des = "get all follow success"};
             }
             catch(Exception ex)
