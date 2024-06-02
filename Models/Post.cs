@@ -17,5 +17,9 @@ namespace Reddit_App.Models
 
         public string TagID { get; set; }
 
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedDate { get; set; }
+
     }
 }

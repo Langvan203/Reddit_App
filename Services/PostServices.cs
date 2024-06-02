@@ -100,39 +100,6 @@ namespace Reddit_App.Services
                 var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
                 List<GetPostDto> listPost = new List<GetPostDto>();
                 
-                
-                List<GetLikeInPostDto> lUserInLike = new List<GetLikeInPostDto>();
-                //foreach(var item in likes)
-                //{
-                //    var ul = new GetLikeInPostDto();
-                //    var checkUser = allUserInLike.FirstOrDefault(p => p.UserID == item.UserID);
-                //    if(checkUser != null)
-                //    {
-                //        ul.UserID = checkUser.UserID;
-                //    }    
-
-                //}    
-                foreach(var item in LuserLike)
-                {
-                    var lu = new GetLikeInPostDto();
-                    lu.UserID = item;
-                    lUserInLike.Add(lu);
-                }    
-                List<GetListCommentPostDto> LComment = new List<GetListCommentPostDto>();
-                foreach (var item in comments)
-                {
-                    var cm = new GetListCommentPostDto();
-                    cm.Content = item.Content;
-                    var checkUser = allUserIncomment.FirstOrDefault(p => p.UserID == item.UserID);
-                    if(checkUser != null)
-                    {
-                        cm.UserID = checkUser.UserID;
-                        cm.UserName = checkUser.UserName;
-                        cm.Avata = checkUser.Image;
-                    }
-                    LComment.Add(cm);
-                }    
-                
                 foreach (var item in res)
                 {
                     var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
@@ -149,29 +116,41 @@ namespace Reddit_App.Services
                         dsPost.UserName = checkUser.UserName;
                         dsPost.Avata = checkUser.Image;
                     }
+
+                    // get all list comment in post
+                    var listcomment = comments.Where(t => t.PostID == item.PostID).Select(t => new GetListCommentPostDto
+                    {
+                        Content = t.Content,
+                        UserID = t.UserID,
+                        UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
+                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault()
+                    }).ToList();
+                    dsPost.ListComment = listcomment;
+
+                    // get all tag list in post
                     var tagIDs = System.Text.Json.JsonSerializer.Deserialize<List<int>>(item.TagID);
                     var tagNames = allTags.Where(t => tagIDs.Contains(t.TagID)).Select(t => new TagDto
                     {
                         ID = t.TagID,
                         Name = t.TagName
                     }).ToList();
+
+
+                    // get all like in post
+                    var listlike = likes.Where(l => l.PostID == item.PostID).Select(l => new GetLikeInPostDto
+                    {
+                        UserID = allUserInLike.Where(u => u.UserID == l.UserID).Select(u => u.UserID).FirstOrDefault()
+                    }).ToList();
+                    dsPost.ListLike = listlike;
+
+
                     dsPost.ListTag = tagNames;
-                    //foreach (var items in tagNames)
-                    //{
-                    //    dsPost.TagName.Add(items.Name);
-                    //}
                     dsPost.TotalComment = totalComment;
                     dsPost.TotalLike = totalLike;
                     listPost.Add(dsPost);
                 }
                 listPost.Reverse();
-                return new
-                {
-                    Data = listPost,
-                    ListComment = LComment,
-                    ListLike = lUserInLike
-
-                };
+                return listPost;
             }
             catch(Exception ex)
             {
@@ -212,10 +191,11 @@ namespace Reddit_App.Services
                     }
                     postUpdate.Image = "posts/images/" + date + request.Image.FileName;
                 }
-                postUpdate.TagID = request.TagID;
+                postUpdate.TagID = JsonSerializer.Serialize(request.TagID);
                 postUpdate.Title = request.Title;
                 postUpdate.Content = request.Content;
                 postUpdate.UserID = userID;
+                postUpdate.UpdatedDate = DateTime.UtcNow;
                 _postRespository.UpdateByEntity(postUpdate);
                 _postRespository.SaveChange();
                 return postUpdate;
@@ -226,18 +206,6 @@ namespace Reddit_App.Services
             }
         }
 
-        //public object GetPostByTag(int tagID)
-        //{
-        //    try
-        //    {
-        //        var res = _postRespository.FindAll().Where(p => p.TagID == tagID);
-        //        return res;
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         // khi tìm kiếm bằng UTF-8 và khi không có thì lỗi tìm 
         public object GetPostByContent(string content)

@@ -2,7 +2,7 @@
 
 namespace Reddit_App.Models
 {
-    public class Share
+    public class Share 
     {
         [Key]
         public int ShareID { get; set; }
