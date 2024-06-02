@@ -47,6 +47,8 @@ namespace Reddit_App.Database
             {
                 entity.Property(e => e.Image).IsRequired(false);
             });
+
+           
         }
     }
 }

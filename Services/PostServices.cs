@@ -9,6 +9,7 @@ using Reddit_App.Models;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.AspNetCore.SignalR;
 using Reddit_App.Helpers.SendnotificationHub;
+using System.Text.Json;
 
 
 namespace Reddit_App.Services
@@ -19,6 +20,7 @@ namespace Reddit_App.Services
         private readonly usersRepository _userRepository;
         private readonly TagRespository _tagRepository;
         private readonly CommentRepository _commentRepository;
+        private readonly LikeRepository _likeRepository;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _webhost;
         private readonly ApiOptions _apiOptions;
@@ -31,6 +33,7 @@ namespace Reddit_App.Services
             _userRepository = new usersRepository(apiOptions, dbContext, mapper);
             _tagRepository = new TagRespository(apiOptions, dbContext, mapper);
             _commentRepository = new CommentRepository(apiOptions, dbContext, mapper);
+            _likeRepository = new LikeRepository(apiOptions, dbContext, mapper);
             _followRepository = new FollowRepository(apiOptions, dbContext, mapper);
             _apiOptions = apiOptions;
             _mapper = mapper; 
@@ -55,6 +58,7 @@ namespace Reddit_App.Services
                     p.Image = "posts/images/" + date + request.Image.FileName;
                 }
                 p.UserID = userID;
+                p.TagID = JsonSerializer.Serialize(request.TagID);
                 _postRespository.Create(p);
                 _postRespository.SaveChange();
                 var followers = _followRepository.FindByCondition(f => f.FollowedID == userID && f.Status == 1).ToList();
@@ -71,7 +75,7 @@ namespace Reddit_App.Services
             }
         }
 
-        public object GetAllPost()
+        public object GetListPost()
         {
             try
             {
@@ -79,43 +83,102 @@ namespace Reddit_App.Services
                 var listUser = res.Select(p => p.UserID).ToList();
                 var listTag = res.Select(p => p.TagID).ToList();
                 var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
-                var tagPost = _tagRepository.FindByCondition(t => listTag.Contains(t.TagID)).ToList();
+                var allTags = _tagRepository.FindAll().ToList();
+
+                // get list comment by postid
                 var listComment = res.Select(p => p.PostID).ToList();
                 var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var userInComment = comments.Select(m => m.UserID).ToList();
+                var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
                 var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+
+                // get list like by postid
+                var listLike = res.Select(p => p.PostID).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+                var LuserLike = likes.Select(p => p.UserID).ToList();
+                var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
                 List<GetPostDto> listPost = new List<GetPostDto>();
-                foreach(var item in res)
+                
+                
+                List<GetLikeInPostDto> lUserInLike = new List<GetLikeInPostDto>();
+                //foreach(var item in likes)
+                //{
+                //    var ul = new GetLikeInPostDto();
+                //    var checkUser = allUserInLike.FirstOrDefault(p => p.UserID == item.UserID);
+                //    if(checkUser != null)
+                //    {
+                //        ul.UserID = checkUser.UserID;
+                //    }    
+
+                //}    
+                foreach(var item in LuserLike)
+                {
+                    var lu = new GetLikeInPostDto();
+                    lu.UserID = item;
+                    lUserInLike.Add(lu);
+                }    
+                List<GetListCommentPostDto> LComment = new List<GetListCommentPostDto>();
+                foreach (var item in comments)
+                {
+                    var cm = new GetListCommentPostDto();
+                    cm.Content = item.Content;
+                    var checkUser = allUserIncomment.FirstOrDefault(p => p.UserID == item.UserID);
+                    if(checkUser != null)
+                    {
+                        cm.UserID = checkUser.UserID;
+                        cm.UserName = checkUser.UserName;
+                        cm.Avata = checkUser.Image;
+                    }
+                    LComment.Add(cm);
+                }    
+                
+                foreach (var item in res)
                 {
                     var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
+                    var totalLike = likeCount.ContainsKey(item.PostID) ? likeCount[item.PostID] : 0;
                     var dsPost = new GetPostDto();
                     dsPost.PostID = item.PostID;
                     dsPost.Content = item.Content;
                     dsPost.Title = item.Title;
                     dsPost.Image = item.Image;
                     var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
-                    if(checkUser != null)
+                    if (checkUser != null)
                     {
                         dsPost.UserID = checkUser.UserID;
                         dsPost.UserName = checkUser.UserName;
                         dsPost.Avata = checkUser.Image;
                     }
-                    var checkTag = tagPost.FirstOrDefault(t => t.TagID == item.TagID);
-                    if(checkTag != null)
+                    var tagIDs = System.Text.Json.JsonSerializer.Deserialize<List<int>>(item.TagID);
+                    var tagNames = allTags.Where(t => tagIDs.Contains(t.TagID)).Select(t => new TagDto
                     {
-                        dsPost.TagName = checkTag.TagName;
-                    }
+                        ID = t.TagID,
+                        Name = t.TagName
+                    }).ToList();
+                    dsPost.ListTag = tagNames;
+                    //foreach (var items in tagNames)
+                    //{
+                    //    dsPost.TagName.Add(items.Name);
+                    //}
                     dsPost.TotalComment = totalComment;
+                    dsPost.TotalLike = totalLike;
                     listPost.Add(dsPost);
                 }
                 listPost.Reverse();
-                return listPost;
+                return new
+                {
+                    Data = listPost,
+                    ListComment = LComment,
+                    ListLike = lUserInLike
+
+                };
             }
-            catch
+            catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "get all post failed" };
+                throw ex;
             }
         }
-        
+
         public object GetPostByUser(int userID)
         {
             try
@@ -129,26 +192,26 @@ namespace Reddit_App.Services
             }
         }
 
-        public object UpdatePost(UpdatePostRequest request,int userID)
+        public object UpdatePost(UpdatePostRequest request, int userID)
         {
             try
             {
                 // kiểm tra xem nếu user đó là người đăng bài thì mới cho phép cập nhật lại bài viết của mình
                 var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID && p.UserID == userID).FirstOrDefault();
-                if(postUpdate == null)
+                if (postUpdate == null)
                 {
                     return new MessageData { Data = null, Des = "Can't not find post" };
-                }    
-                if(request.Image != null && request.Image.FileName != postUpdate.Image)
+                }
+                if (request.Image != null && request.Image.FileName != postUpdate.Image)
                 {
                     var date = DateTime.UtcNow.ToString("yyyy_MM_dd");
-                    using(FileStream fileStream = File.Create(_webhost.WebRootPath + "\\posts\\images\\" + date + request.Image.FileName))
+                    using (FileStream fileStream = File.Create(_webhost.WebRootPath + "\\posts\\images\\" + date + request.Image.FileName))
                     {
                         request.Image.CopyTo(fileStream);
                         fileStream.Flush();
                     }
-                    postUpdate.Image = "posts/images/" + date + request.Image.FileName;      
-                }    
+                    postUpdate.Image = "posts/images/" + date + request.Image.FileName;
+                }
                 postUpdate.TagID = request.TagID;
                 postUpdate.Title = request.Title;
                 postUpdate.Content = request.Content;
@@ -157,31 +220,31 @@ namespace Reddit_App.Services
                 _postRespository.SaveChange();
                 return postUpdate;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
         }
 
-        public object GetPostByTag(int tagID)
-        {
-            try
-            {
-                var res = _postRespository.FindAll().Where(p => p.TagID == tagID);
-                return res;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-        }
+        //public object GetPostByTag(int tagID)
+        //{
+        //    try
+        //    {
+        //        var res = _postRespository.FindAll().Where(p => p.TagID == tagID);
+        //        return res;
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
 
         // khi tìm kiếm bằng UTF-8 và khi không có thì lỗi tìm 
-        public object GetPostByContent(string content, string title)
+        public object GetPostByContent(string content)
         {
             try
             {
-                var res = _postRespository.FindByCondition(p => p.Content.Contains(content) || p.Title.Contains(title));
+                var res = _postRespository.FindByCondition(p => p.Content.Contains(content) || p.Title.Contains(content));
                 return res;
             }
             catch(Exception ex)

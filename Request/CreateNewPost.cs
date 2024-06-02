@@ -8,6 +8,6 @@
 
         public IFormFile? Image { get; set; }
         
-        public int TagID { get; set; }
+        public List<int> TagID { get; set; }
     }
 }

@@ -81,22 +81,9 @@ namespace Reddit_App.Services
                 {
                     return null;
                 }
-
-
-
-                //var newUser = new users()
-                //{
-                //    UserName = request.UserName,
-                //    PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord),
-                //    Email = request.Email,
-                //    DateOfBirth = request.DateOfBirth,
-                //    Role = "User",
-                //    Status = true,
-                //    Image = ""
-                //};
-
                 var newUser = _mapper.Map<users>(request);
                 newUser.Role = "User";
+                newUser.Image = "/avata/images/default-avatar-profile-icon-of-social-media-user-vector.jpg";
                 newUser.PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord);
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();

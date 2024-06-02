@@ -15,8 +15,10 @@
 
         public string Avata { get; set; }
 
-        public string TagName { get; set; }
+        public List<TagDto> ListTag { get; set; }
 
         public int TotalComment { get; set; }
+
+        public int TotalLike { get; set; }
     }
 }

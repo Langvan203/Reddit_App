@@ -10,6 +10,6 @@
 
         public IFormFile? Image { get; set; }
 
-        public int TagID { get; set; }
+        public string TagID { get; set; }
     }
 }

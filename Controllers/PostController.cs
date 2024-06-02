@@ -41,15 +41,15 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
-        // get list post
-        [HttpGet]
-        [Route("GetListPost")]
+        //get list post
+       [HttpGet]
+       [Route("GetListPost")]
         public MessageData GetAllPost()
         {
             try
             {
-                var res = _postServices.GetAllPost();
-                return new MessageData { Data = res, Des = "Get list post success" };
+                var res = _postServices.GetListPost();
+                return new MessageData { Data = res, Des = "Get post" };
             }
             catch (Exception ex)
             {
@@ -57,20 +57,20 @@ namespace Reddit_App.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("GetPostByTag")]
-        public MessageData GetPostByTag(int tagID)
-        {
-            try
-            {
-                var res = _postServices.GetPostByTag(tagID);
-                return new MessageData { Data = res, Des = "get post by tag succes" };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        }
+        //[HttpGet]
+        //[Route("GetPostByTag")]
+        //public MessageData GetPostByTag(string tagID)
+        //{
+        //    try
+        //    {
+        //        var res = _postServices.GetPostByTag(tagID);
+        //        return new MessageData { Data = res, Des = "get post by tag succes" };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return NG(ex);
+        //    }
+        //}
         [HttpGet]
         [Route("GetPostByUserID")]
         public MessageData GetPostByUserID()
@@ -85,20 +85,20 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
-        [HttpPut]
-        [Route("UpdatePost")]
-        public MessageData UpdatePost([FromForm] UpdatePostRequest request)
-        {
-            try
-            {
-                var res = _postServices.UpdatePost(request, UserIDLogined);
-                return new MessageData { Data = res, Des = "Update post success" };
-            }
-            catch(Exception ex)
-            {
-                return NG(ex);
-            }
-        }
+        //[HttpPut]
+        //[Route("UpdatePost")]
+        //public MessageData UpdatePost([FromForm] UpdatePostRequest request)
+        //{
+        //    try
+        //    {
+        //        var res = _postServices.UpdatePost(request, UserIDLogined);
+        //        return new MessageData { Data = res, Des = "Update post success" };
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return NG(ex);
+        //    }
+        //}
         [HttpDelete]
         [Route("DeletePost")]
         public MessageData DeletPost(int postID)
@@ -115,11 +115,11 @@ namespace Reddit_App.Controllers
         }
         [HttpGet]
         [Route("GetPostContent")]
-        public MessageData GetPostByContentAndTitle(string content, string title)
+        public MessageData GetPostByContentAndTitle(string content)
         {
             try
             {
-                var res = _postServices.GetPostByContent(content, title);
+                var res = _postServices.GetPostByContent(content);
                 return new MessageData { Data = res, Des = "Get post by content succes" };
             }
             catch(Exception ex)
