@@ -109,6 +109,8 @@ namespace Reddit_App.Services
                     dsPost.Content = item.Content;
                     dsPost.Title = item.Title;
                     dsPost.Image = item.Image;
+                    dsPost.CreatedDate = item.CreatedDate;
+                    dsPost.UpdatedDate = item.UpdatedDate;
                     var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
                     if (checkUser != null)
                     {
