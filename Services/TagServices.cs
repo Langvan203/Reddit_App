@@ -67,7 +67,8 @@ namespace Reddit_App.Services
                 var res = _tagRepos.FindByCondition(r => r.TagID == TagID).FirstOrDefault();
                 if (res != null)
                 {
-                    _tagRepos.DeleteByEntity(res);
+                    res.TagStatus = 0;
+                    _tagRepos.UpdateByEntity(res);
                     _tagRepos.SaveChange();
                     return res;
                 }
