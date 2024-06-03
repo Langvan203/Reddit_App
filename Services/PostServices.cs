@@ -91,14 +91,14 @@ namespace Reddit_App.Services
 
                 // get list comment by postid
                 var listComment = res.Select(p => p.PostID).ToList();
-                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID) && m.CommentStatus == 1).ToList();
                 var userInComment = comments.Select(m => m.UserID).ToList();
                 var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
                 var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
 
                 // get list like by postid
                 var listLike = res.Select(p => p.PostID).ToList();
-                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID) && m.LikeStatus == 1).ToList();
                 var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
                 var LuserLike = likes.Select(p => p.UserID).ToList();
                 var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
@@ -177,14 +177,14 @@ namespace Reddit_App.Services
 
                 // get list comment by postid
                 var listComment = res.Select(p => p.PostID).ToList();
-                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID) && m.CommentStatus == 1).ToList();
                 var userInComment = comments.Select(m => m.UserID).ToList();
                 var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
                 var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
 
                 // get list like by postid
                 var listLike = res.Select(p => p.PostID).ToList();
-                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID) && m.LikeStatus == 1).ToList();
                 var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
                 var LuserLike = likes.Select(p => p.UserID).ToList();
                 var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
@@ -349,14 +349,14 @@ namespace Reddit_App.Services
 
                 // get list comment by postid
                 var listComment = res.Select(p => p.PostID).ToList();
-                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID) && m.CommentStatus == 1).ToList();
                 var userInComment = comments.Select(m => m.UserID).ToList();
                 var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
                 var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
 
                 // get list like by postid
                 var listLike = res.Select(p => p.PostID).ToList();
-                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID) && m.LikeStatus == 1).ToList();
                 var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
                 var LuserLike = likes.Select(p => p.UserID).ToList();
                 var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
