@@ -84,7 +84,7 @@ namespace Reddit_App.Services
                 var newUser = _mapper.Map<users>(request);
                 newUser.Role = "User";
                 newUser.Status = 1;
-                newUser.Image = "/avata/images/default-avatar-profile-icon-of-social-media-user-vector.jpg";
+                newUser.Image = "/avata/images/backgroundefault.png";
                 newUser.PassWord = Utility.UtilityFunction.CreateMD5(request.PassWord);
                 _userRepository.Create(newUser);
                 _userRepository.SaveChange();
