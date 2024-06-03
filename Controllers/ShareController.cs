@@ -28,7 +28,7 @@ namespace Reddit_App.Controllers
         {
             try
             {
-                var res = _shareServices.GetListShare(PostID);
+                var res = _shareServices.GetListShare(UserIDLogined,PostID);
                 return new MessageData { Data = res, Des = "Get list share succes" };
             }
             catch(Exception ex)

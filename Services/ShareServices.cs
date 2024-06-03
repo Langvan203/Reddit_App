@@ -62,11 +62,11 @@ namespace Reddit_App.Services
             }
         }
 
-        public object GetListShare(int PostID)
+        public object GetListShare(int UserLoginedID,int PostID)
         {
             try
             {
-                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID).ToList();
+                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID && s.UserID == UserLoginedID).ToList();
                 var lUser = lShare.Select(s => s.UserID).ToList();
                 var users = _userRepository.FindByCondition(u => lUser.Contains(u.UserID)).ToList();
                 List<GetListShareDto> listShare = new List<GetListShareDto>();
