@@ -24,23 +24,39 @@ namespace Reddit_App.Services
             _webhost = webHost;
         }
 
-        public async Task<MessageData> CreateNewNoti(int uID, string content)
+        public object CreateNewNoti(int SenderID, CreateNewNotificationsRequest request)
         {
             try
             {
-                var request = new CreateNewNotifications
-                {
-                    UserID = uID,
-                    Content = content
-                };
-                var newNoti = _mapper.Map<Notifications>(request);
-                _notirepo.Create(newNoti);
+                var p = _mapper.Map<Notifications>(request);
+                p.SenderID = SenderID;
+                _notirepo.Create(p);
                 _notirepo.SaveChange();
-                return new MessageData { Data = newNoti, Des = "Add new notisuccess" };
+                return p;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Error" };
+                throw ex;
+            }
+        }
+
+        public object GetNotification(int UserLoginedID)
+        {
+            try
+            {
+                var res = _notirepo.FindByCondition(u => u.ReceiverID == UserLoginedID);
+                if(res != null)
+                {
+                    return res;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
     }

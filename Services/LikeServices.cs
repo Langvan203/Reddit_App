@@ -59,13 +59,12 @@ namespace Reddit_App.Services
             }
 
         }
- 
 
         public object getListLike(int PostID)
         {
             try
             {
-                var res = _likeRepository.FindByCondition(l => l.PostID == PostID).ToList();
+                var res = _likeRepository.FindByCondition(l => l.PostID == PostID && l.LikeStatus == 1).ToList();
                 var listUserID = res.Select(p => p.UserID);
                 var users = _userRepository.FindByCondition(p => listUserID.Contains(p.UserID)).ToList();
                 List<GetLikeDto> listLike = new List<GetLikeDto>();

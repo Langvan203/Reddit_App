@@ -55,6 +55,7 @@ namespace Reddit_App.Controllers
 
         [HttpDelete]
         [Route("DeleteTag")]
+        [Authorize(Roles = "Admin")]
         public MessageData RemoveTag(int TagID)
         {
             try
@@ -67,5 +68,22 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
+
+        [HttpGet]
+        [Route("GetListTagByAdmin")]
+        [Authorize(Roles = "Admin")]
+        public MessageData GetListTagAdmin()
+        {
+            try
+            {
+                var res = _tagServices.GetListTagByAdmin();
+                return new MessageData { Data = res, Des = "Get list tag success" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
     }
 }

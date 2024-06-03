@@ -8,5 +8,7 @@ namespace Reddit_App.Models
         public int TagID { get; set; }
 
         public string TagName { get; set; }
+
+        public int TagStatus { get; set; }
     }
 }

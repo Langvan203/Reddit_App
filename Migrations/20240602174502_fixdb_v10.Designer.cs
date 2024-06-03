@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reddit_App.Database;
 
@@ -11,9 +12,10 @@ using Reddit_App.Database;
 namespace Reddit_App.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240602174502_fixdb_v10")]
+    partial class fixdb_v10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +31,6 @@ namespace Reddit_App.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentID"), 1L, 1);
-
-                    b.Property<int>("CommentParentID")
-                        .HasColumnType("int");
 
                     b.Property<int>("CommentStatus")
                         .HasColumnType("int");
@@ -119,13 +118,7 @@ namespace Reddit_App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ReceiverID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SenderID")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("NotiID");
@@ -151,9 +144,6 @@ namespace Reddit_App.Migrations
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PostStatus")
-                        .HasColumnType("int");
 
                     b.Property<string>("TagID")
                         .IsRequired()
@@ -208,9 +198,6 @@ namespace Reddit_App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TagStatus")
-                        .HasColumnType("int");
-
                     b.HasKey("TagID");
 
                     b.ToTable("Tags");
@@ -242,8 +229,8 @@ namespace Reddit_App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .IsRequired()

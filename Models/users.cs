@@ -17,7 +17,7 @@ namespace Reddit_App.Models
 
         public string Role { get; set; }
 
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
         public string Image { get; set; }
     }

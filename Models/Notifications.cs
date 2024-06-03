@@ -9,8 +9,10 @@ namespace Reddit_App.Models
 
         public string Content { get; set; }
 
-        public int UserID { get; set; }
+        public int SenderID { get; set; }
 
-        // cần thêm field TimeCreated để sinh hiển thị thời gian đã nhận thông báo
+        public int ReceiverID { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

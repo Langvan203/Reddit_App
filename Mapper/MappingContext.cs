@@ -14,12 +14,13 @@ namespace Reddit_App.Mapper
             CreateMap<UpdatePostRequest, Post>();
             CreateMap<LikeRequest, Like>();
             CreateMap<NewFollowRequest, Follow>();
-            CreateMap<CreateNewNotifications, Notifications>();
+            CreateMap<CreateNewNotificationsRequest, Notifications>();
             CreateMap<ShareRequest, Share>();
             CreateMap<NewCommentRequest, Comment>();
             CreateMap<UserRegisterRequest, users>();
             CreateMap<UpdateUserInfoRequest, users>();
             CreateMap<TagRequest, Tags>();
+            CreateMap<CreateNewNotificationsRequest, Notifications>();
         } 
     }
 }

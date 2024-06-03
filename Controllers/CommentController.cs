@@ -56,7 +56,7 @@ namespace Reddit_App.Controllers
 
         [HttpPut]
         [Route("UpdateComment")]
-        public MessageData UpdateComment([FromForm] NewCommentRequest request)
+        public MessageData UpdateComment([FromForm] UpdateCommentRequest request)
         {
             try
             {
@@ -73,11 +73,11 @@ namespace Reddit_App.Controllers
         [HttpDelete]
         [Route("DeleteCommentByUser")]
 
-        public MessageData DeleteCommentByUser(NewCommentRequest request)
+        public MessageData DeleteCommentByUser(int CommentID)
         {
             try
             {
-                var res = _commentservices.DeleteComment(UserIDLogined, request);
+                var res = _commentservices.DeleteComment(UserIDLogined, CommentID);
                 return new MessageData { Data = res, Des = "Delete comment succes" };
             }
             catch(Exception ex)

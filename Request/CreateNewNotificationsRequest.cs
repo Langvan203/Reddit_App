@@ -1,9 +1,9 @@
 ﻿namespace Reddit_App.Request
 {
-    public class CreateNewNotifications
+    public class CreateNewNotificationsRequest
     {
         public string Content { get; set; }
 
-        public int UserID { get; set; }
+        public int ReceiverID { get; set; }
     }
 }

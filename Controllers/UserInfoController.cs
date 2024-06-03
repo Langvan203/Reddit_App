@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Reddit_App.Common;
 using Reddit_App.Dto;
 using Reddit_App.Request;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Reddit_App.Controllers
 {
@@ -62,6 +63,38 @@ namespace Reddit_App.Controllers
                 return new MessageData { Data = res, Des = "update user info succes" };
             }
             catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetListUserByAdmin")]
+        [Authorize(Roles = "Admin")]
+        public MessageData GetListUserByAdmin()
+        {
+            try
+            {
+                var res = _userinfo.GetListUserByAdmin();
+                return new MessageData { Data = res, Des = "Get list user by admin" };
+            }
+            catch(Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteUserByAdmin")]
+        [Authorize(Roles = "Admin")]
+        public MessageData DeleteUserByAdmin(int UserID)
+        {
+            try
+            {
+                var res = _userinfo.BlockUserByAdmin(UserID);
+                return new MessageData { Data = res, Des = "Block user by admin" };
+            }
+            catch (Exception ex)
             {
                 return NG(ex);
             }

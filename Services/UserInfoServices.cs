@@ -6,6 +6,7 @@ using Reddit_App.Models;
 using Reddit_App.Repositories;
 using Reddit_App.Request;
 using System.IO;
+using System.Net.WebSockets;
 
 namespace Reddit_App.Services
 {
@@ -74,11 +75,15 @@ namespace Reddit_App.Services
             try
             {
                 var res = _usersRepository.FindByCondition(u => u.UserID == UserLoginID).FirstOrDefault();
-                return res;
+                if(res != null)
+                {
+                    return res;
+                }
+                return null;
             }
             catch(Exception ex)
             {
-                return new MessageData { Data = null, Des = "Can't not find user" };
+                throw ex;
             }
         }
         
@@ -86,12 +91,63 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _usersRepository.FindByCondition(u => u.UserID == UserID).FirstOrDefault();
-                return res;
+                var res = _usersRepository.FindByCondition(u => u.UserID == UserID && u.Status == 1).FirstOrDefault();
+                if (res != null)
+                {
+                    return res;
+                }
+                return null;
             }
             catch (Exception ex)
             {
-                return new MessageData { Data = null, Des = "Can't not find user" };
+                throw ex;
+            }
+        }
+
+        public object GetListUserByAdmin()
+        {
+            try
+            {
+                var res = _usersRepository.FindAll();
+                if (res != null)
+                {
+                    return res;
+                }
+                return null;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public object BlockUserByAdmin(int UserID)
+        {
+            try
+            {
+                var res = _usersRepository.FindByCondition(u => u.UserID == UserID).FirstOrDefault();
+                if(res == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    if(res.Status == 0)
+                    {
+                        res.Status = 1;
+                    }
+                    else
+                    {
+                        res.Status = 0;
+                    }
+                    _usersRepository.UpdateByEntity(res);
+                    _usersRepository.SaveChange();
+                    return res;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
     }

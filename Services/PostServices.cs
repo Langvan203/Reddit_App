@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.AspNetCore.SignalR;
 using Reddit_App.Helpers.SendnotificationHub;
 using System.Text.Json;
+using NetTopologySuite.Index.HPRtree;
+
+
 
 
 namespace Reddit_App.Services
@@ -58,6 +61,7 @@ namespace Reddit_App.Services
                     p.Image = "posts/images/" + date + request.Image.FileName;
                 }
                 p.UserID = userID;
+                p.PostStatus = 1;
                 p.TagID = JsonSerializer.Serialize(request.TagID);
                 _postRespository.Create(p);
                 _postRespository.SaveChange();
@@ -79,7 +83,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _postRespository.FindAll().ToList();
+                var res = _postRespository.FindByCondition(p => p.PostStatus == 1).ToList();
                 var listUser = res.Select(p => p.UserID).ToList();
                 var listTag = res.Select(p => p.TagID).ToList();
                 var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
@@ -125,7 +129,94 @@ namespace Reddit_App.Services
                         Content = t.Content,
                         UserID = t.UserID,
                         UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
-                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault()
+                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
+                        CommentID = t.CommentID
+                    }).ToList();
+                    dsPost.ListComment = listcomment;
+
+                    // get all tag list in post
+                    var tagIDs = JsonSerializer.Deserialize<List<int>>(item.TagID);
+                    var tagNames = allTags.Where(t => tagIDs.Contains(t.TagID)).Select(t => new TagDto
+                    {
+                        ID = t.TagID,
+                        Name = t.TagName
+                    }).ToList();
+
+
+                    // get all like in post
+                    var listlike = likes.Where(l => l.PostID == item.PostID).Select(l => new GetLikeInPostDto
+                    {
+                        UserID = allUserInLike.Where(u => u.UserID == l.UserID).Select(u => u.UserID).FirstOrDefault()
+                    }).ToList();
+                    dsPost.ListLike = listlike;
+
+                    dsPost.ListTag = tagNames;
+                    dsPost.TotalComment = totalComment;
+                    dsPost.TotalLike = totalLike;
+                    listPost.Add(dsPost);
+                }
+                listPost.Reverse();
+                return listPost;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        public object GetPostByID(int PostID)
+        {
+            try
+            {
+                var res = _postRespository.FindByCondition(p => p.PostID == PostID && p.PostStatus == 1);
+                var listUser = res.Select(p => p.UserID).ToList();
+                var listTag = res.Select(p => p.TagID).ToList();
+                var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
+                var allTags = _tagRepository.FindAll().ToList();
+
+                // get list comment by postid
+                var listComment = res.Select(p => p.PostID).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var userInComment = comments.Select(m => m.UserID).ToList();
+                var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
+                var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+
+                // get list like by postid
+                var listLike = res.Select(p => p.PostID).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+                var LuserLike = likes.Select(p => p.UserID).ToList();
+                var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
+                List<GetPostDto> listPost = new List<GetPostDto>();
+
+                foreach (var item in res)
+                {
+                    var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
+                    var totalLike = likeCount.ContainsKey(item.PostID) ? likeCount[item.PostID] : 0;
+                    var dsPost = new GetPostDto();
+                    dsPost.PostID = item.PostID;
+                    dsPost.Content = item.Content;
+                    dsPost.Title = item.Title;
+                    dsPost.Image = item.Image;
+                    dsPost.CreatedDate = item.CreatedDate;
+                    dsPost.UpdatedDate = item.UpdatedDate;
+                    var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
+                    if (checkUser != null)
+                    {
+                        dsPost.UserID = checkUser.UserID;
+                        dsPost.UserName = checkUser.UserName;
+                        dsPost.Avata = checkUser.Image;
+                    }
+
+                    // get all list comment in post
+                    var listcomment = comments.Where(t => t.PostID == item.PostID).Select(t => new GetListCommentPostDto
+                    {
+                        Content = t.Content,
+                        UserID = t.UserID,
+                        UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
+                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
+                        CommentID = t.CommentID
                     }).ToList();
                     dsPost.ListComment = listcomment;
 
@@ -145,7 +236,6 @@ namespace Reddit_App.Services
                     }).ToList();
                     dsPost.ListLike = listlike;
 
-
                     dsPost.ListTag = tagNames;
                     dsPost.TotalComment = totalComment;
                     dsPost.TotalLike = totalLike;
@@ -154,7 +244,7 @@ namespace Reddit_App.Services
                 listPost.Reverse();
                 return listPost;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -164,7 +254,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _postRespository.FindAll().Where(c => c.UserID == userID);
+                var res = _postRespository.FindByCondition(p => p.PostStatus == 1 && p.UserID == userID);
                 return res;
             }
             catch(Exception ex)
@@ -178,7 +268,7 @@ namespace Reddit_App.Services
             try
             {
                 // kiểm tra xem nếu user đó là người đăng bài thì mới cho phép cập nhật lại bài viết của mình
-                var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID && p.UserID == userID).FirstOrDefault();
+                var postUpdate = _postRespository.FindByCondition(p => p.PostID == request.PostID && p.UserID == userID && p.PostStatus == 1).FirstOrDefault();
                 if (postUpdate == null)
                 {
                     return new MessageData { Data = null, Des = "Can't not find post" };
@@ -223,18 +313,19 @@ namespace Reddit_App.Services
             }
         }
 
-        public object DeletePostByID(int PostID)
+        public object DeletePostByID(int PostID, int UserCreatedPost)
         {
             try
             {
-                var res = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
+                var res = _postRespository.FindByCondition(p => p.PostID == PostID && p.UserID == UserCreatedPost && p.PostStatus == 1).FirstOrDefault();
                 if(res == null)
                 {
                     return null;
                 }    
                 else
                 {
-                    _postRespository.DeleteByEntity(res);
+                    res.PostStatus = 0;
+                    _postRespository.UpdateByEntity(res);
                     _postRespository.SaveChange();
                     return res;
                 }    
@@ -245,5 +336,197 @@ namespace Reddit_App.Services
             }
         }
 
+        public object GetPostByTag(int TagID)
+        {
+            try
+            {
+                var posts = _postRespository.FindByCondition(p => p.PostStatus == 1).ToList();
+                var res = posts.Where(t => (Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(t.TagID).Contains(TagID))).ToList();
+                var listUser = res.Select(p => p.UserID).ToList();
+                var listTag = res.Select(p => p.TagID).ToList();
+                var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
+                var allTags = _tagRepository.FindAll().ToList();
+
+                // get list comment by postid
+                var listComment = res.Select(p => p.PostID).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var userInComment = comments.Select(m => m.UserID).ToList();
+                var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
+                var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+
+                // get list like by postid
+                var listLike = res.Select(p => p.PostID).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+                var LuserLike = likes.Select(p => p.UserID).ToList();
+                var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
+                List<GetPostDto> listPost = new List<GetPostDto>();
+
+                foreach (var item in res)
+                {
+                    var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
+                    var totalLike = likeCount.ContainsKey(item.PostID) ? likeCount[item.PostID] : 0;
+                    var dsPost = new GetPostDto();
+                    dsPost.PostID = item.PostID;
+                    dsPost.Content = item.Content;
+                    dsPost.Title = item.Title;
+                    dsPost.Image = item.Image;
+                    dsPost.CreatedDate = item.CreatedDate;
+                    dsPost.UpdatedDate = item.UpdatedDate;
+                    var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
+                    if (checkUser != null)
+                    {
+                        dsPost.UserID = checkUser.UserID;
+                        dsPost.UserName = checkUser.UserName;
+                        dsPost.Avata = checkUser.Image;
+                    }
+
+                    // get all list comment in post
+                    var listcomment = comments.Where(t => t.PostID == item.PostID).Select(t => new GetListCommentPostDto
+                    {
+                        Content = t.Content,
+                        UserID = t.UserID,
+                        UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
+                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
+                        CommentID = t.CommentID
+                    }).ToList();
+                    dsPost.ListComment = listcomment;
+
+                    // get all tag list in post
+                    var tagIDs = System.Text.Json.JsonSerializer.Deserialize<List<int>>(item.TagID);
+                    var tagNames = allTags.Where(t => tagIDs.Contains(t.TagID)).Select(t => new TagDto
+                    {
+                        ID = t.TagID,
+                        Name = t.TagName
+                    }).ToList();
+
+
+                    // get all like in post
+                    var listlike = likes.Where(l => l.PostID == item.PostID).Select(l => new GetLikeInPostDto
+                    {
+                        UserID = allUserInLike.Where(u => u.UserID == l.UserID).Select(u => u.UserID).FirstOrDefault()
+                    }).ToList();
+                    dsPost.ListLike = listlike;
+
+                    dsPost.ListTag = tagNames;
+                    dsPost.TotalComment = totalComment;
+                    dsPost.TotalLike = totalLike;
+                    listPost.Add(dsPost);
+                }
+                listPost.Reverse();
+                return listPost;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public object DeletePostByAdmin(int PostID)
+        {
+            try
+            {
+                var res = _postRespository.FindByCondition(p => p.PostID == PostID).FirstOrDefault();
+                if (res == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    res.PostStatus = 0;
+                    _postRespository.UpdateByEntity(res);
+                    _postRespository.SaveChange();
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public object GetListPostByAdmin()
+        {
+            try
+            {
+                var res = _postRespository.FindAll().ToList();
+                var listUser = res.Select(p => p.UserID).ToList();
+                var listTag = res.Select(p => p.TagID).ToList();
+                var userPost = _userRepository.FindByCondition(p => listUser.Contains(p.UserID)).ToList();
+                var allTags = _tagRepository.FindAll().ToList();
+
+                // get list comment by postid
+                var listComment = res.Select(p => p.PostID).ToList();
+                var comments = _commentRepository.FindByCondition(m => listComment.Contains(m.PostID)).ToList();
+                var userInComment = comments.Select(m => m.UserID).ToList();
+                var allUserIncomment = _userRepository.FindByCondition(p => userInComment.Contains(p.UserID)).ToList();
+                var commentsCount = comments.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+
+                // get list like by postid
+                var listLike = res.Select(p => p.PostID).ToList();
+                var likes = _likeRepository.FindByCondition(m => listLike.Contains(m.PostID)).ToList();
+                var likeCount = likes.GroupBy(c => c.PostID).ToDictionary(g => g.Key, g => g.Count());
+                var LuserLike = likes.Select(p => p.UserID).ToList();
+                var allUserInLike = _userRepository.FindByCondition(p => LuserLike.Contains(p.UserID)).ToList();
+                List<GetPostDto> listPost = new List<GetPostDto>();
+
+                foreach (var item in res)
+                {
+                    var totalComment = commentsCount.ContainsKey(item.PostID) ? commentsCount[item.PostID] : 0;
+                    var totalLike = likeCount.ContainsKey(item.PostID) ? likeCount[item.PostID] : 0;
+                    var dsPost = new GetPostDto();
+                    dsPost.PostID = item.PostID;
+                    dsPost.Content = item.Content;
+                    dsPost.Title = item.Title;
+                    dsPost.Image = item.Image;
+                    dsPost.CreatedDate = item.CreatedDate;
+                    dsPost.UpdatedDate = item.UpdatedDate;
+                    var checkUser = userPost.FirstOrDefault(p => p.UserID == item.UserID);
+                    if (checkUser != null)
+                    {
+                        dsPost.UserID = checkUser.UserID;
+                        dsPost.UserName = checkUser.UserName;
+                        dsPost.Avata = checkUser.Image;
+                    }
+
+                    // get all list comment in post
+                    var listcomment = comments.Where(t => t.PostID == item.PostID).Select(t => new GetListCommentPostDto
+                    {
+                        Content = t.Content,
+                        UserID = t.UserID,
+                        UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
+                        Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
+                        CommentID = t.CommentID
+                    }).ToList();
+                    dsPost.ListComment = listcomment;
+
+                    // get all tag list in post
+                    var tagIDs = JsonSerializer.Deserialize<List<int>>(item.TagID);
+                    var tagNames = allTags.Where(t => tagIDs.Contains(t.TagID)).Select(t => new TagDto
+                    {
+                        ID = t.TagID,
+                        Name = t.TagName
+                    }).ToList();
+
+
+                    // get all like in post
+                    var listlike = likes.Where(l => l.PostID == item.PostID).Select(l => new GetLikeInPostDto
+                    {
+                        UserID = allUserInLike.Where(u => u.UserID == l.UserID).Select(u => u.UserID).FirstOrDefault()
+                    }).ToList();
+                    dsPost.ListLike = listlike;
+
+                    dsPost.ListTag = tagNames;
+                    dsPost.TotalComment = totalComment;
+                    dsPost.TotalLike = totalLike;
+                    listPost.Add(dsPost);
+                }
+                listPost.Reverse();
+                return listPost;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

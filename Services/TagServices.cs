@@ -30,6 +30,7 @@ namespace Reddit_App.Services
                 if(res == null)
                 {
                     var newTag = _mapper.Map<Tags>(request);
+                    newTag.TagStatus = 1;
                     _tagRepos.Create(newTag);
                     _tagRepos.SaveChange();
                     return newTag;
@@ -50,7 +51,7 @@ namespace Reddit_App.Services
         {
             try
             {
-                var res = _tagRepos.FindAll();
+                var res = _tagRepos.FindByCondition(t => t.TagStatus == 1);
                 return res;
             }
             catch(Exception ex)
@@ -77,6 +78,19 @@ namespace Reddit_App.Services
                 throw ex;
             }
 
+        }
+
+        public object GetListTagByAdmin()
+        {
+            try
+            {
+                var res = _tagRepos.FindAll();
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
     }

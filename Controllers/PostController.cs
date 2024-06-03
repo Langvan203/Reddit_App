@@ -57,7 +57,36 @@ namespace Reddit_App.Controllers
             }
         }
 
-        
+        [HttpGet]
+        [Route("GetPostByID")]
+        public MessageData GetPostByID(int PostID)
+        {
+            try
+            {
+                var res = _postServices.GetPostByID(PostID);
+                return new MessageData { Data = res, Des = "Get post" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetPostByTag")]
+        public MessageData GetPostByTag(int TagID)
+        {
+            try
+            {
+                var res = _postServices.GetPostByTag(TagID);
+                return new MessageData { Data = res, Des = "Get post" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
         [HttpGet]
         [Route("GetPostByUserID")]
         public MessageData GetPostByUserID()
@@ -92,7 +121,7 @@ namespace Reddit_App.Controllers
         {
             try
             {
-                var res = _postServices.DeletePostByID(postID);
+                var res = _postServices.DeletePostByID(postID, UserIDLogined);
                 return new MessageData { Data = res, Des = "Delete post success" };
             }
             catch(Exception ex)
@@ -114,6 +143,35 @@ namespace Reddit_App.Controllers
                 return NG(ex);
             }
         }
-        
+        [HttpGet]
+        [Route("GetListPostAdmin")]
+        [Authorize(Roles = "Admin")]
+        public MessageData GetPostByAdmin()
+        {
+            try
+            {
+                var res = _postServices.GetListPostByAdmin();
+                return new MessageData { Data = res, Des = "Get post by content succes" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+        [HttpDelete]
+        [Route("DeletePostByAdmin")]
+        [Authorize(Roles = "Admin")]
+        public MessageData DeletPostByAdmin(int postID)
+        {
+            try
+            {
+                var res = _postServices.DeletePostByAdmin(postID);
+                return new MessageData { Data = res, Des = "Delete post success" };
+            }
+            catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
     }
 }

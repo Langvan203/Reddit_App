@@ -1,6 +1,6 @@
 ﻿namespace Reddit_App.Request
 {
-    public class NewCommentRequest
+    public class UpdateCommentRequest
     {
         public int PostID { get; set; }
 
@@ -8,6 +8,6 @@
 
         public IFormFile? ImageURL { get; set; }
 
-        public int? CommentParentID { get; set; }
+        public int CommentID { get; set; }
     }
 }

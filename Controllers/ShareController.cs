@@ -38,7 +38,7 @@ namespace Reddit_App.Controllers
         }
 
         [HttpPost]
-        [Route("Add new share")]
+        [Route("AddNewS hare")]
         public MessageData AddNewShare(ShareRequest request)
         {
             try
@@ -52,19 +52,6 @@ namespace Reddit_App.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("GetTotalShare")]
-        public MessageData GetTotalShare(int PostID)
-        {
-            try
-            {
-                var res = _shareServices.GetNumberShare(PostID);
-                return new MessageData { Data = res, Des = "Get total share success" };
-            }
-            catch (Exception ex)
-            {
-                return NG(ex);
-            }
-        }
+       
     }
 }

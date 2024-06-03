@@ -21,5 +21,7 @@ namespace Reddit_App.Models
 
         public DateTime UpdatedDate { get; set; }
 
+        public int PostStatus { get; set; }
+
     }
 }

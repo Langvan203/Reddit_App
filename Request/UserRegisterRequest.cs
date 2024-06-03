@@ -8,8 +8,10 @@
 
         public string Email { get; set; }
 
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; } = DateTime.UtcNow;
 
         public IFormFile? ImageAvata { get; set; }
+
+        public int Status { get; set; } = 1;
     }
 }

@@ -44,6 +44,7 @@ namespace Reddit_App.Services
                 }
                 newComment.CommentStatus = 1;
                 newComment.UserID = UserLogined;
+                newComment.CreatedDate = DateTime.UtcNow;
                 _commentRepository.Create(newComment);
                 _commentRepository.SaveChange();
                 return newComment;
@@ -89,14 +90,15 @@ namespace Reddit_App.Services
             }
         }
 
-        public object UpdateComment(int UserLogined, NewCommentRequest request)
+        public object UpdateComment(int UserLogined, UpdateCommentRequest request)
         {
             try
             {
-                var uComment = _commentRepository.FindByCondition(m => m.UserID == UserLogined && m.PostID == request.PostID && m.CommentStatus == 1).FirstOrDefault();
+                var uComment = _commentRepository.FindByCondition(m => m.UserID == UserLogined && m.PostID == request.PostID && m.CommentStatus == 1 && m.CommentID == request.CommentID).FirstOrDefault();
                 if (uComment != null)
                 {
                     uComment.Content = request.Content;
+                    uComment.UpdatedDate = DateTime.UtcNow;
                     _commentRepository.UpdateByEntity(uComment);
                     _commentRepository.SaveChange();
                     return uComment;
@@ -112,12 +114,12 @@ namespace Reddit_App.Services
             }
         }
         
-        public object DeleteComment(int UserLogined, NewCommentRequest request)
+        public object DeleteComment(int UserLogined, int CommentID)
         {
             try
             {
                 
-                var dComment = _commentRepository.FindByCondition(m => m.UserID == UserLogined && m.PostID == request.PostID && m.CommentStatus == 1).FirstOrDefault();
+                var dComment = _commentRepository.FindByCondition(m => m.UserID == UserLogined && m.CommentID == CommentID && m.CommentStatus == 1).FirstOrDefault();
                 if(dComment != null)
                 {
                     dComment.CommentStatus = 0;

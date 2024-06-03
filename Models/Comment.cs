@@ -16,5 +16,11 @@ namespace Reddit_App.Models
         public int CommentStatus { get; set; }
 
         public string Image { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime UpdatedDate { get; set; }
+
+        public int CommentParentID { get; set; }
     }
 }

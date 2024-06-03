@@ -91,21 +91,6 @@ namespace Reddit_App.Services
             }
         }
 
-        public object GetNumberShare(int PostID)
-        {
-            try
-            {
-                var nShare = _shareRepository.FindByCondition(s => s.PostID == PostID && s.ShareStatus == 1).GroupBy(l => l.PostID).Select(l => new
-                {
-                    PostID = l.Key,
-                    NumberShare = l.Count()
-                });
-                return nShare;
-            }
-            catch(Exception ex) {
-
-                throw ex;
-            }
-        }
+        
     }
 }

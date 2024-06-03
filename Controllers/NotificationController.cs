@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using Reddit_App.Common;
 using Reddit_App.Database;
 using Reddit_App.Dto;
+using Reddit_App.Request;
 using Reddit_App.Services;
 
 namespace Reddit_App.Controllers
@@ -27,14 +28,29 @@ namespace Reddit_App.Controllers
         [HttpPost]
         [Route("CreateNewNoti")]
 
-        public MessageData CreateNewNoti()
+        public MessageData CreateNewNoti(CreateNewNotificationsRequest request)
         {
             try
             {
-                var res = _notiServices.CreateNewNoti(UserIDLogined, "abc");
+                var res = _notiServices.CreateNewNoti(UserIDLogined, request);
                 return new MessageData { Data = res, Des = "send notification successfull" };
             }
             catch (Exception ex)
+            {
+                return NG(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetListNotification")]
+        public MessageData GetListNoti()
+        {
+            try
+            {
+                var res = _notiServices.GetNotification(UserIDLogined);
+                return new MessageData { Data = res, Des = "Get noti" };
+            }
+            catch(Exception ex)
             {
                 return NG(ex);
             }
