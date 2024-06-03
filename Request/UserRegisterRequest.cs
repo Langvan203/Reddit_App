@@ -12,6 +12,5 @@
 
         public IFormFile? ImageAvata { get; set; }
 
-        public int Status { get; set; } = 1;
     }
 }

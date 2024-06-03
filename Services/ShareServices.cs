@@ -62,24 +62,27 @@ namespace Reddit_App.Services
             }
         }
 
-        public object GetListShare(int UserLoginedID,int PostID)
+        public object GetListShare(int UserLoginedID)
         {
             try
             {
-                var lShare = _shareRepository.FindByCondition(s => s.PostID == PostID && s.UserID == UserLoginedID).ToList();
+                var lShare = _shareRepository.FindByCondition(s => s.UserID == UserLoginedID).ToList();
                 var lUser = lShare.Select(s => s.UserID).ToList();
                 var users = _userRepository.FindByCondition(u => lUser.Contains(u.UserID)).ToList();
                 List<GetListShareDto> listShare = new List<GetListShareDto>();
                 foreach(var item in lShare)
                 {
                     var shareU = new GetListShareDto();
+                    
                     var checkUser = users.FirstOrDefault(u => u.UserID == item.UserID);
                     if(checkUser != null)
                     {
                         shareU.UserName = checkUser.UserName;
                         shareU.UserID = checkUser.UserID;
                         shareU.Image = checkUser.Image;
+                        
                     }
+                    shareU.PostID = item.PostID;
                     listShare.Add(shareU);
                 }
                 listShare.Reverse();

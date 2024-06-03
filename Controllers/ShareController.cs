@@ -24,11 +24,11 @@ namespace Reddit_App.Controllers
 
         [HttpGet]
         [Route("GetListShare")]
-        public MessageData GetListShare(int PostID)
+        public MessageData GetListShare()
         {
             try
             {
-                var res = _shareServices.GetListShare(UserIDLogined,PostID);
+                var res = _shareServices.GetListShare(UserIDLogined);
                 return new MessageData { Data = res, Des = "Get list share succes" };
             }
             catch(Exception ex)
@@ -38,7 +38,7 @@ namespace Reddit_App.Controllers
         }
 
         [HttpPost]
-        [Route("AddNewS hare")]
+        [Route("AddNewShare")]
         public MessageData AddNewShare(ShareRequest request)
         {
             try
