@@ -130,7 +130,9 @@ namespace Reddit_App.Services
                         UserID = t.UserID,
                         UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
                         Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
-                        CommentID = t.CommentID
+                        CommentID = t.CommentID,
+                        CommentParentID = t.CommentParentID
+                        
                     }).ToList();
                     dsPost.ListComment = listcomment;
 
@@ -216,7 +218,8 @@ namespace Reddit_App.Services
                         UserID = t.UserID,
                         UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
                         Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
-                        CommentID = t.CommentID
+                        CommentID = t.CommentID,
+                        CommentParentID = t.CommentParentID
                     }).ToList();
                     dsPost.ListComment = listcomment;
 
@@ -388,7 +391,8 @@ namespace Reddit_App.Services
                         UserID = t.UserID,
                         UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
                         Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
-                        CommentID = t.CommentID
+                        CommentID = t.CommentID,
+                        CommentParentID = t.CommentParentID
                     }).ToList();
                     dsPost.ListComment = listcomment;
 
@@ -495,7 +499,8 @@ namespace Reddit_App.Services
                         UserID = t.UserID,
                         UserName = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.UserName).FirstOrDefault(),
                         Avata = allUserIncomment.Where(u => u.UserID == t.UserID).Select(u => u.Image).FirstOrDefault(),
-                        CommentID = t.CommentID
+                        CommentID = t.CommentID,
+                        CommentParentID = t.CommentParentID
                     }).ToList();
                     dsPost.ListComment = listcomment;
 
